@@ -57,7 +57,7 @@ const styles = StyleSheet.create({
     color: colors.accentGray,
   },
   upload: {
-    ...font(15, "500")
+    ...font(16, "500")
   },
 });
 
