@@ -124,6 +124,7 @@ const SignUpForm = (props) => {
       flags[3].value &&
       checkBoxState
     ) {
+      console.log("Signup APi==>");
       // if true send form data into redux store and move to step 2
       setLoading(true);
       const response = await SignUpStep1API(
@@ -314,12 +315,12 @@ const SignUpForm = (props) => {
         <TermsOfServiceModal
           modal={setTOSModalVisible}
           visibility={TOSVisible}
-        //buttonNotVisible={true}
+          //buttonNotVisible={true}
         />
         <PrivacyPolicyModal
           modal={setPrivacyPolicyModalVisible}
           visibility={privacyPolicyVisible}
-        //buttonNotVisible={true}
+          //buttonNotVisible={true}
         />
       </ScrollView>
     </View>

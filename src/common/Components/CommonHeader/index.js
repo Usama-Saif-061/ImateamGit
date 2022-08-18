@@ -19,14 +19,17 @@ const CommonHeader = (props) => {
 
       <Text style={styles.newPost}>{props.centerText}</Text>
       {/* PARENT FUNCTION.. CHANGES THE STATE TO TRUE TO COMPLETE THE ACTION IN USESTATE */}
-
-      <TouchableOpacity
-        onPress={() => {
-          props.isNewPost ? props.onPressPost() : props.onDone(true);
-        }}
-      >
-        <Text style={styles.post}>{props.endText}</Text>
-      </TouchableOpacity>
+      {props?.endText ? (
+        <TouchableOpacity
+          onPress={() => {
+            props.isNewPost ? props.onPressPost() : props.onDone(true);
+          }}
+        >
+          <Text style={styles.post}>{props.endText}</Text>
+        </TouchableOpacity>
+      ) : (
+        <View />
+      )}
     </View>
   );
 };

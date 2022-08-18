@@ -2,10 +2,8 @@ import { Dimensions } from "react-native";
 import ImgToBase64 from "react-native-image-base64";
 import colors from "./colors";
 import moment from "moment";
-import 'moment-timezone'
-import {
-  notifications,
-} from 'react-native-firebase-push-notifications';
+import "moment-timezone";
+import { notifications } from "react-native-firebase-push-notifications";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export const { width: fullWidth, height: fullHeight } =
@@ -76,12 +74,12 @@ export const ValidateLastName = (text) => {
 export const GOOGLE_API_KEY = "AIzaSyBQyEE67gM0AvoJAzwp7fSdDlPqKwqKTxU";
 
 export const ValidateEmail = (mail) => {
-  let reg = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
+  // let reg = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
+  let reg =
+    /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
   if (reg.test(mail) === false || mail.length > 50) {
     return false;
   } else {
-    console.log("Email is Correct");
-
     return true;
   }
 };
@@ -159,92 +157,93 @@ export const getData = (string) => {
 
 export const getTranslatedTime = (time, timezone) => {
   if (timezone) {
-    return moment.utc(time).tz(timezone)
+    return moment.utc(time).tz(timezone);
   } else {
-    return moment.utc(time).tz(moment.tz.guess())
+    return moment.utc(time).tz(moment.tz.guess());
   }
-}
+};
 
 export const validateUrl = (url) => {
-  const regex = new RegExp('(https?://)?([\\da-z.-]+)\\.([a-z.]{2,6})[/\\w .-]*/?');
+  const regex = new RegExp(
+    "(https?://)?([\\da-z.-]+)\\.([a-z.]{2,6})[/\\w .-]*/?"
+  );
   return regex.test(url);
-}
+};
 
 export const filterDailyTime = (time, dateNow) => {
   switch (time) {
-    case '12:00 AM':
-      return moment(dateNow).format('YYYY-MM-DDT24:00')
-    case '1:00 AM':
-      return moment(dateNow).format('YYYY-MM-DDT01:00')
-    case '2:00 AM':
-      return moment(dateNow).format('YYYY-MM-DDT02:00')
-    case '3:00 AM':
-      return moment(dateNow).format('YYYY-MM-DDT03:00')
-    case '4:00 AM':
-      return moment(dateNow).format('YYYY-MM-DDT04:00')
-    case '5:00 AM':
-      return moment(dateNow).format('YYYY-MM-DDT05:00')
-    case '6:00 AM':
-      return moment(dateNow).format('YYYY-MM-DDT06:00')
-    case '7:00 AM':
-      return moment(dateNow).format('YYYY-MM-DDT07:00')
-    case '8:00 AM':
-      return moment(dateNow).format('YYYY-MM-DDT08:00')
-    case '9:00 AM':
-      return moment(dateNow).format('YYYY-MM-DDT09:00')
-    case '10:00 AM':
-      return moment(dateNow).format('YYYY-MM-DDT10:00')
-    case '11:00 AM':
-      return moment(dateNow).format('YYYY-MM-DDT11:00')
-    case '12:00 PM':
-      return moment(dateNow).format('YYYY-MM-DDT12:00')
-    case '1:00 PM':
-      return moment(dateNow).format('YYYY-MM-DDT13:00')
-    case '2:00 PM':
-      return moment(dateNow).format('YYYY-MM-DDT14:00')
-    case '3:00 PM':
-      return moment(dateNow).format('YYYY-MM-DDT15:00')
-    case '4:00 PM':
-      return moment(dateNow).format('YYYY-MM-DDT16:00')
-    case '5:00 PM':
-      return moment(dateNow).format('YYYY-MM-DDT17:00')
-    case '6:00 PM':
-      return moment(dateNow).format('YYYY-MM-DDT18:00')
-    case '7:00 PM':
-      return moment(dateNow).format('YYYY-MM-DDT19:00')
-    case '8:00 PM':
-      return moment(dateNow).format('YYYY-MM-DDT20:00')
-    case '9:00 PM':
-      return moment(dateNow).format('YYYY-MM-DDT21:00')
-    case '10:00 PM':
-      return moment(dateNow).format('YYYY-MM-DDT22:00')
-    case '11:00 PM':
-      return moment(dateNow).format('YYYY-MM-DDT23:00')
+    case "12:00 AM":
+      return moment(dateNow).format("YYYY-MM-DDT24:00");
+    case "1:00 AM":
+      return moment(dateNow).format("YYYY-MM-DDT01:00");
+    case "2:00 AM":
+      return moment(dateNow).format("YYYY-MM-DDT02:00");
+    case "3:00 AM":
+      return moment(dateNow).format("YYYY-MM-DDT03:00");
+    case "4:00 AM":
+      return moment(dateNow).format("YYYY-MM-DDT04:00");
+    case "5:00 AM":
+      return moment(dateNow).format("YYYY-MM-DDT05:00");
+    case "6:00 AM":
+      return moment(dateNow).format("YYYY-MM-DDT06:00");
+    case "7:00 AM":
+      return moment(dateNow).format("YYYY-MM-DDT07:00");
+    case "8:00 AM":
+      return moment(dateNow).format("YYYY-MM-DDT08:00");
+    case "9:00 AM":
+      return moment(dateNow).format("YYYY-MM-DDT09:00");
+    case "10:00 AM":
+      return moment(dateNow).format("YYYY-MM-DDT10:00");
+    case "11:00 AM":
+      return moment(dateNow).format("YYYY-MM-DDT11:00");
+    case "12:00 PM":
+      return moment(dateNow).format("YYYY-MM-DDT12:00");
+    case "1:00 PM":
+      return moment(dateNow).format("YYYY-MM-DDT13:00");
+    case "2:00 PM":
+      return moment(dateNow).format("YYYY-MM-DDT14:00");
+    case "3:00 PM":
+      return moment(dateNow).format("YYYY-MM-DDT15:00");
+    case "4:00 PM":
+      return moment(dateNow).format("YYYY-MM-DDT16:00");
+    case "5:00 PM":
+      return moment(dateNow).format("YYYY-MM-DDT17:00");
+    case "6:00 PM":
+      return moment(dateNow).format("YYYY-MM-DDT18:00");
+    case "7:00 PM":
+      return moment(dateNow).format("YYYY-MM-DDT19:00");
+    case "8:00 PM":
+      return moment(dateNow).format("YYYY-MM-DDT20:00");
+    case "9:00 PM":
+      return moment(dateNow).format("YYYY-MM-DDT21:00");
+    case "10:00 PM":
+      return moment(dateNow).format("YYYY-MM-DDT22:00");
+    case "11:00 PM":
+      return moment(dateNow).format("YYYY-MM-DDT23:00");
     default:
       return;
   }
-}
+};
 
 export const capitalizeFirstLetter = (txt) => {
-  return txt.charAt(0).toUpperCase() + txt.slice(1)
-}
+  return txt.charAt(0).toUpperCase() + txt.slice(1);
+};
 
-export const ScreenSize = Dimensions.get('screen');
+export const ScreenSize = Dimensions.get("screen");
 
 export const convertToSlug = (text) => {
   return text
     .toLowerCase()
-    .replace(/ /g, '-')
-    .replace(/[^\w-]+/g, '')
-    ;
-}
+    .replace(/ /g, "-")
+    .replace(/[^\w-]+/g, "");
+};
 
 export const getFirebaseToken = async () => {
   try {
-    let token = await notifications.getToken()
-    return token
+    let token = await notifications.getToken();
+    return token;
   } catch (e) {
-    console.log('Error while getting firebase token', e)
+    console.log("Error while getting firebase token", e);
     return null;
   }
-}
+};
