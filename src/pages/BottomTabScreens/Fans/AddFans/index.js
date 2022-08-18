@@ -20,6 +20,16 @@ import { useUpdateFansMutation } from "../../../../Reducers/usersApi";
 import { useGetUserQuery } from "../../../../Reducers/usersApi";
 import EmptyProfileComp from "../../../../common/Components/Profile/EmptyProfileComp";
 import { addFansApi } from "../fansApi";
+import {
+  PanGestureHandler,
+  TapGestureHandler,
+} from "react-native-gesture-handler";
+import Animated, {
+  useAnimatedGestureHandler,
+  useAnimatedStyle,
+  useSharedValue,
+  withSpring,
+} from "react-native-reanimated";
 
 const AddFansModal = (props) => {
   const [fansArr, fillFansArr] = useState([]);
@@ -96,7 +106,8 @@ const AddFansModal = (props) => {
 
   return (
     <Modal animationType="slide" visible={props.openModal} style={styles.modal}>
-      <View style={styles.modalContainer}>
+      {/* <View style={styles.modalContainer}> */}
+      <View style={{ flex: 1, backgroundColor: "red" }}>
         <SafeAreaView>
           <View style={styles.headingContainer}>
             <Text style={styles.heading}>Add Follows</Text>
@@ -113,9 +124,7 @@ const AddFansModal = (props) => {
             </TouchableOpacity>
           </View>
         </SafeAreaView>
-
         {/* tags container */}
-
         {selectedFans.length !== 0 && (
           <ScrollView style={styles.tagWrapper}>
             <View style={styles.tagContainer}>
@@ -144,7 +153,6 @@ const AddFansModal = (props) => {
             </View>
           </ScrollView>
         )}
-
         <TextInput
           value={searchTxt}
           style={styles.input}
@@ -155,8 +163,6 @@ const AddFansModal = (props) => {
             getFans(e);
           }}
         />
-
-        {/* follows container */}
         <ScrollView style={styles.fanWrapper}>
           {!fansArr
             ? null
@@ -195,8 +201,6 @@ const AddFansModal = (props) => {
                 );
               })}
         </ScrollView>
-
-        {/* Will uncomment it later */}
         <View style={styles.buttonWrapper}>
           <TouchableOpacity
             style={styles.buttonContainer}
@@ -209,7 +213,7 @@ const AddFansModal = (props) => {
               method={followFans}
             />
           </TouchableOpacity>
-        </View>
+        </View>{" "}
       </View>
     </Modal>
   );
