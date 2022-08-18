@@ -26,11 +26,13 @@ import {
   SingleMessageApi,
   updateUnreadMsgsApi,
 } from "../API/messagesApi";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import LoadingDots from "react-native-loading-dots";
 import { useGetUserQuery } from "../../../../Reducers/usersApi";
+import { updateChatList } from "../../../../Reducers/CommonReducers/chatSlice";
 
 const GroupChat = ({ navigation, route }) => {
+  const dispatch = useDispatch();
   const [comment, setComment] = useState("");
   const fileBottomSheetRef = useRef(null);
   const [imageArray, setImageArray] = useState([]);
@@ -326,6 +328,7 @@ const GroupChat = ({ navigation, route }) => {
       console.log("body before api -> ", body);
       const res = await SingleMessageApi(chatObj?.id, body);
       if (res.resultCode == 200) {
+        dispatch(updateChatList(true));
         getAllMessagesFunc(false);
         setSendFlag(true);
         console.log("Send pressed response -> ", JSON.stringify(res));
@@ -358,7 +361,6 @@ const GroupChat = ({ navigation, route }) => {
         }
         chatObj={chatObj}
         navigation={navigation}
-        updateOnBack={true}
       />
       {/* {Main Chat here} */}
       {!loader ? (
@@ -408,8 +410,7 @@ const GroupChat = ({ navigation, route }) => {
           ios: getHeightPixel(25),
           android: getHeightPixel(20),
         })}
-        enabled
-        behavior={Platform.OS == "ios" ? "padding" : "height"}
+        behavior={Platform.OS == "ios" ? "padding" : "position"}
       >
         <MessageComponent
           comment={comment}

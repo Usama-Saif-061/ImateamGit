@@ -8,9 +8,6 @@ import {
   ActivityIndicator,
   Alert,
   Keyboard,
-  useWindowDimensions,
-  Animated,
-  SafeAreaView,
 } from "react-native";
 import ProfileHeader from "../../../../common/Components/ProfileHeader";
 import MessageComponent from "../Components/MessageComponent";
@@ -27,14 +24,15 @@ import ImagePicker from "react-native-image-crop-picker";
 // import MediaMessage from './MediaMessage'
 import { getAllMessages, updateUnreadMsgsApi } from "../API/messagesApi";
 import { SingleMessageApi } from "../API/messagesApi";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useGetUserQuery } from "../../../../Reducers/usersApi";
 import LoadingDots from "react-native-loading-dots";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import { updateChatList } from "../../../../Reducers/CommonReducers/chatSlice";
 
 const SingleChat = ({ navigation, route }) => {
   const { data: userInfo, isFetching: fetch } = useGetUserQuery();
-
+  const dispatch = useDispatch();
   const [comment, setComment] = useState("");
   const fileBottomSheetRef = useRef(null);
   const [imageArray, setImageArray] = useState([]);
@@ -69,7 +67,7 @@ const SingleChat = ({ navigation, route }) => {
       "keyboardDidHide",
       () => setKeyboardVisible(false)
     );
-    getAllMessagesFunc(true);
+    // getAllMessagesFunc(true);
     return () => {
       keyboardDidHideListener.remove();
       keyboardDidShowListener.remove();
@@ -347,9 +345,9 @@ const SingleChat = ({ navigation, route }) => {
       console.log("body before api -> ", body);
       const res = await SingleMessageApi(chatObj?.id, body);
       if (res.resultCode == 200) {
+        dispatch(updateChatList(true));
         getAllMessagesFunc(false);
         setSendFlag(true);
-        console.log("getAllMessages response here");
       } else {
         Alert.alert(
           "Error",
@@ -377,7 +375,6 @@ const SingleChat = ({ navigation, route }) => {
       <SingleChatHeader
         title={receiverObj ? receiverObj.display_name : "Anonymous"}
         navigation={navigation}
-        updateOnBack={true}
       />
       {!loader ? (
         <View style={{ flex: 1 }}>
@@ -422,16 +419,15 @@ const SingleChat = ({ navigation, route }) => {
           <ActivityIndicator size="large" color={colors.primary} />
         </View>
       )}
+
       <KeyboardAvoidingView
         // keyboardVerticalOffset={getHeightPixel(45)}
         keyboardVerticalOffset={Platform.select({
           ios: getHeightPixel(25),
           android: getHeightPixel(15),
         })}
-        enabled
-        behavior={Platform.OS == "ios" ? "padding" : "height"}
+        behavior={Platform.OS == "ios" ? "padding" : "position"}
       >
-        {/* {Main Chat here} */}
         <MessageComponent
           comment={comment}
           setComment={(text) => setComment(text)}

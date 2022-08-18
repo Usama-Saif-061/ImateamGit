@@ -21,12 +21,7 @@ const GroupHeader = (props) => {
     <View style={styles.mainContainer}>
       <TouchableOpacity
         onPress={() => {
-          if (props?.updateOnBack) {
-            dispatch(updateChatList(true));
-            props.navigation.goBack();
-          } else {
-            props.navigation.goBack();
-          }
+          props.navigation.goBack();
         }}
         style={{ padding: getWidthPixel(10) }}
       >

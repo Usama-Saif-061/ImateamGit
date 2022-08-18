@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useLayoutEffect } from "react";
 import {
   View,
   Alert,
@@ -48,7 +48,7 @@ const MessagesMain = ({ navigation }) => {
   useEffect(() => {
     getAllChats(false);
   }, [selector.chat.updateChat]);
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (selector.chat.updateList) {
       getAllChats(false);
     }
@@ -59,10 +59,7 @@ const MessagesMain = ({ navigation }) => {
       const res = await getAllConversations();
       setLoader(false);
       if (res.resultCode == 200) {
-        // console.log('getAllConversations (Messages Main) -> ', JSON.stringify(res))
-        console.log("getAllConversations response here");
         dispatch(setExistingChats(res.data));
-        // let arr = res.data.filter(item => item.hidden !== true)
         let temp = [...res.data];
         var arr1 = temp.sort(
           (a, b) =>
@@ -181,7 +178,8 @@ const MessagesMain = ({ navigation }) => {
       </View>
       <ModalComponent
         modalHeader="Confirm delete"
-        modalContent="You are about to permanently delete yourself from this team. Please confirm by clicking delete."
+        // modalContent="You are about to permanently delete yourself from this team. Please confirm by clicking delete."
+        modalContent="Would you like to delete this conversation from your list?"
         showPopup={showPopUp}
         setShowPopup={(value) => setShowPopUp(value)}
         loading={loading}

@@ -1,11 +1,10 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import {
   View,
   Text,
   Modal,
   TextInput,
   TouchableOpacity,
-  Pressable,
   ScrollView,
   Image,
   SafeAreaView,
@@ -16,13 +15,11 @@ import Icon from "react-native-vector-icons/AntDesign";
 import styles from "./style";
 import notConnectedFans from "../../../../Reducers/getNotConnectedFans";
 import { ShowInitialsOfName } from "../../../../common/Components/ShowInitialsOfName";
-import addFollow from "../../API/addFollowAPI";
 import { useGetFansQuery } from "../../../../Reducers/usersApi";
 import { useUpdateFansMutation } from "../../../../Reducers/usersApi";
 import { useGetUserQuery } from "../../../../Reducers/usersApi";
 import EmptyProfileComp from "../../../../common/Components/Profile/EmptyProfileComp";
-import axios from "axios";
-import { addFansApi } from '../fansApi'
+import { addFansApi } from "../fansApi";
 
 const AddFansModal = (props) => {
   const [fansArr, fillFansArr] = useState([]);
@@ -49,7 +46,6 @@ const AddFansModal = (props) => {
       fillFansArr([]);
     }
   };
-
 
   // const followFans = async () => {
   //   let followArr = [];
@@ -79,16 +75,16 @@ const AddFansModal = (props) => {
     };
     // let response = await addFan(userData.id, JSON.stringify(body));
     try {
-      let response = await addFansApi(userData.id, body)
+      let response = await addFansApi(userData.id, body);
       console.log("Respo fan adding => ", JSON.stringify(response));
       if (response.resultCode == 200) {
-        props.setFans(response.data)
+        props.setFans(response.data);
         selectFans([]);
         fillFansArr([]);
         props.modal(false);
       }
     } catch (e) {
-      console.log('error ', e)
+      console.log("error ", e);
     }
   };
 
@@ -103,13 +99,13 @@ const AddFansModal = (props) => {
       <View style={styles.modalContainer}>
         <SafeAreaView>
           <View style={styles.headingContainer}>
-            <Text style={styles.heading}>Search Follows</Text>
+            <Text style={styles.heading}>Add Follows</Text>
             <TouchableOpacity
               style={styles.icon}
               onPress={() => {
                 fillFansArr([]);
-                selectFans([])
-                setSearchTxt('')
+                selectFans([]);
+                setSearchTxt("");
                 props.modal(false);
               }}
             >
@@ -165,39 +161,39 @@ const AddFansModal = (props) => {
           {!fansArr
             ? null
             : fansArr.map((fan, id) => {
-              return (
-                <TouchableOpacity
-                  style={[
-                    styles.fanComponent,
-                    id === 0 && {
-                      borderTopColor: colors.lightGray,
-                      borderTopWidth: 0.5,
-                    },
-                  ]}
-                  onPress={() => {
-                    setSearchTxt("");
-                    selectFans([...selectedFans, fan]);
-                    fansArr.splice(id, 1);
-                    // fillFansArr([...fansArr]);
-                    fillFansArr([]);
-                  }}
-                  key={id}
-                >
-                  <View>
-                    {fan.avatar.upload ? (
-                      <Image
-                        source={{ uri: fan.avatar.url }}
-                        style={styles.profileImage}
-                      />
-                    ) : (
-                      <EmptyProfileComp name={fan.display_name} userId={id} />
-                    )}
-                  </View>
+                return (
+                  <TouchableOpacity
+                    style={[
+                      styles.fanComponent,
+                      id === 0 && {
+                        borderTopColor: colors.lightGray,
+                        borderTopWidth: 0.5,
+                      },
+                    ]}
+                    onPress={() => {
+                      setSearchTxt("");
+                      selectFans([...selectedFans, fan]);
+                      fansArr.splice(id, 1);
+                      // fillFansArr([...fansArr]);
+                      fillFansArr([]);
+                    }}
+                    key={id}
+                  >
+                    <View>
+                      {fan.avatar.upload ? (
+                        <Image
+                          source={{ uri: fan.avatar.url }}
+                          style={styles.profileImage}
+                        />
+                      ) : (
+                        <EmptyProfileComp name={fan.display_name} userId={id} />
+                      )}
+                    </View>
 
-                  <Text style={styles.fanName}>{fan.display_name}</Text>
-                </TouchableOpacity>
-              );
-            })}
+                    <Text style={styles.fanName}>{fan.display_name}</Text>
+                  </TouchableOpacity>
+                );
+              })}
         </ScrollView>
 
         {/* Will uncomment it later */}
