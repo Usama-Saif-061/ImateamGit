@@ -1,14 +1,14 @@
 import React, { useEffect, useRef, useState } from "react";
-import { View, FlatList, TouchableOpacity, Dimensions, Text, TouchableWithoutFeedback, TouchableNativeFeedback, Platform } from "react-native";
+import { View, FlatList, TouchableOpacity, Dimensions, Text, TouchableWithoutFeedback, TouchableNativeFeedback, Platform, Image } from "react-native";
 import FastImage from "react-native-fast-image";
 import Icon from "react-native-vector-icons/AntDesign";
-import colors from "../../colors";
+import colors from "../../../../../common/colors";
 import {
   getWidthPercentage,
   getHeightPixel,
   getHeightPercentage,
   getWidthPixel,
-} from "../../helper";
+} from "../../../../../common/helper";
 
 import WebView from "react-native-webview";
 import Video from "react-native-video";
@@ -18,6 +18,7 @@ import AttachmentPost from "./AttachmentPost";
 import Pdf from 'react-native-pdf';
 import ImageZoom from 'react-native-image-pan-zoom';
 import PhotoView from 'react-native-photo-view';
+import icons from "../../../../../common/icons";
 
 const TeamAttachmentList = (props) => {
   const {
@@ -26,7 +27,8 @@ const TeamAttachmentList = (props) => {
     commentIndex,
     onAttachmentPressed,
     openingFrom,
-    scrollIndex
+    scrollIndex,
+    removeItem
   } = props;
   const flatListRef = useRef(null)
   const [page, setPage] = useState(1)
@@ -47,46 +49,76 @@ const TeamAttachmentList = (props) => {
       <View
         style={{
           width: getWidthPercentage(attachmentWidth),
+          height: openingFrom === "FullPost"
+            ? getHeightPercentage(70)
+            : getHeightPercentage(45),
+          backgroundColor: 'black'
         }}
       >
-        {openingFrom === "FullPost" ? null : (
-          <Icon
-            name="play"
-            size={50}
-            color={colors.primary}
-            onPress={() => { }}
-            // onPress={() => setUri(Uri.slice(index + 1))}
+        {
+          item?.upload ?
+            <Icon
+              name="play"
+              size={50}
+              color={colors.primary}
+              onPress={() => { }}
+              // onPress={() => setUri(Uri.slice(index + 1))}
+              style={{
+                position: "absolute",
+                right:
+                  attachmentWidth === 75
+                    ? getWidthPercentage(33)
+                    : getWidthPercentage(45),
+                bottom: getHeightPercentage(20),
+                zIndex: 999,
+              }}
+              onPress={() => {
+                onAttachmentPressed(index);
+              }}
+            /> :
+            <View style={{
+              position: 'absolute',
+              top: 0,
+              right: 0,
+              left: 0,
+              bottom: 0,
+              justifyContent: 'center',
+              alignItems: 'center'
+            }}>
+              <Icon
+                name="play"
+                size={50}
+                color={colors.primary}
+                // onPress={() => setUri(Uri.slice(index + 1))}
+                style={{
+                  zIndex: 999,
+                }}
+                onPress={() => {
+                  onAttachmentPressed(index);
+                }}
+              />
+            </View>
+        }
+        {
+          item?.upload &&
+          <Video
+            source={{ uri: item?.upload }}
+            minLoadRetryCount={3}
+            controls={openingFrom === "FullPost" ? true : false}
+            // paused={openingFrom === "FullPost" ? false : true}
+            paused={index == scrollIndex ? false : index == listPage ? false : true}
+            fullscreen={true}
+            resizeMode="contain"
             style={{
-              position: "absolute",
-              right:
-                attachmentWidth === 75
-                  ? getWidthPercentage(33)
-                  : getWidthPercentage(45),
-              bottom: getHeightPercentage(20),
-              zIndex: 999,
-            }}
-            onPress={() => {
-              onAttachmentPressed(index);
+              width: "100%",
+              height:
+                openingFrom === "FullPost"
+                  ? getHeightPercentage(70)
+                  : getHeightPercentage(45),
+              //  resizeMode: openingFrom === "FullPost" ? "contain" : "stretch",
             }}
           />
-        )}
-        <Video
-          source={{ uri: item?.upload }}
-          minLoadRetryCount={3}
-          controls={openingFrom === "FullPost" ? true : false}
-          // paused={openingFrom === "FullPost" ? false : true}
-          paused={index == scrollIndex ? false : index == listPage ? false : true}
-          fullscreen={true}
-          resizeMode="contain"
-          style={{
-            width: "100%",
-            height:
-              openingFrom === "FullPost"
-                ? getHeightPercentage(70)
-                : getHeightPercentage(45),
-            //  resizeMode: openingFrom === "FullPost" ? "contain" : "stretch",
-          }}
-        />
+        }
       </View>
     );
   };
@@ -101,7 +133,7 @@ const TeamAttachmentList = (props) => {
       >
         {Platform.OS == "android" ? (
           <PhotoView
-            source={{ uri: item.url }}
+            source={{ uri: item.url ? item.url : item?.path }}
             showsHorizontalScrollIndicator={false}
             showsVerticalScrollIndicator={false}
             minimumZoomScale={1}
@@ -122,7 +154,7 @@ const TeamAttachmentList = (props) => {
           >
             <FastImage
               source={{
-                uri: item.url,
+                uri: item.url ? item.url : item.path,
                 priority: FastImage.priority.high,
               }}
               style={{
@@ -151,44 +183,64 @@ const TeamAttachmentList = (props) => {
           borderColor: colors.white,
         }}
       >
+        {/*  Platform.OS == 'ios' ?
+           <WebView 
+             source={{ 
+              uri: `${item?.url}`, 
+          }} 
+        startInLoadingState={true} 
+        /> : */}
         {
-          // Platform.OS == 'ios' ?
-          //   <WebView
-          //     source={{
-          //       uri: `${item?.url}`,
-          //     }}
-          //     startInLoadingState={true}
-          //   /> :
-          <Pdf
-            page={page}
-            singlePage={false}
-            enablePaging={true}
-            source={{ uri: `${item?.url}`, cache: true }}
-            trustAllCerts={false}
-            style={{
-              flex: 1,
-              width: '100%',
-              height: '100%'
-            }}
-            onPageSingleTap={() => {
-              console.log(page)
-              console.log(totalPages)
-              if (page < totalPages.current) {
-                if (page == 0) {
-                  setPage(2)
+          item?.url ?
+            <Pdf
+              page={page}
+              singlePage={false}
+              enablePaging={true}
+              source={{ uri: `${item?.url}`, cache: true }}
+              trustAllCerts={false}
+              style={{
+                flex: 1,
+                width: '100%',
+                height: '100%'
+              }}
+              onPageSingleTap={() => {
+                console.log(page)
+                console.log(totalPages)
+                if (page < totalPages.current) {
+                  if (page == 0) {
+                    setPage(2)
+                  }
+                  else {
+                    setPage(page + 1)
+                  }
                 }
                 else {
-                  setPage(page + 1)
+                  setPage(1)
                 }
-              }
-              else {
-                setPage(1)
-              }
-            }}
-            onPageChanged={(page, numberOfPages) => {
-              totalPages.current = numberOfPages
-            }}
-          />
+              }}
+              onPageChanged={(page, numberOfPages) => {
+                totalPages.current = numberOfPages
+              }}
+            /> :
+            <View style={{
+              flex: 1,
+            }}>
+              <View style={{
+                position: 'absolute',
+                top: 0,
+                right: 0,
+                left: 0,
+                bottom: 150,
+                justifyContent: 'center',
+                alignItems: 'center'
+              }}>
+                <Icon
+                  name="file1"
+                  size={50}
+                  color={colors.primary}
+                />
+              </View>
+            </View>
         }
       </View>
     );
@@ -198,8 +250,7 @@ const TeamAttachmentList = (props) => {
 
   const renderAttachments = (attachment) => {
     const { item, index } = attachment;
-    const { fileType } = item.payload;
-    //  console.log("fileType: ", fileType);
+    const { fileType } = item.payload ? item.payload : item.fileInfo;
     const Container =
       attachmentWidth === 100 ? TouchableWithoutFeedback : TouchableWithoutFeedback;
     return (
@@ -250,35 +301,35 @@ const TeamAttachmentList = (props) => {
     }
     return size
   }
-  const endView = () => {
-    return (
-      <View
-        style={{
-          ...calculateWidthHeight(4),
-          backgroundColor: "rgba(0,0,0,0.4)",
-          position: "absolute",
-          left: 0,
-          bottom: 0,
-          justifyContent: "center",
-          alignItems: "center"
-        }}
-      >
-        <Text
-          style={{
-            color: "white",
-            fontSize: 18,
-            fontWeight: "500"
-          }}
-        >
+  // const endView = () => {
+  //   return (
+  //     <View
+  //       style={{
+  //         ...calculateWidthHeight(4),
+  //         backgroundColor: "rgba(0,0,0,0.4)",
+  //         position: "absolute",
+  //         left: 0,
+  //         bottom: 0,
+  //         justifyContent: "center",
+  //         alignItems: "center"
+  //       }}
+  //     >
+  //       <Text
+  //         style={{
+  //           color: "white",
+  //           fontSize: 18,
+  //           fontWeight: "500"
+  //         }}
+  //       >
 
-          {
-            `+${data.length - 4}`
-          }
+  //         {
+  //           `+${data.length - 4}`
+  //         }
 
-        </Text>
-      </View>
-    )
-  }
+  //       </Text>
+  //     </View>
+  //   )
+  // }
   return (
     openingFrom == "FullPost" ?
       <FlatList
@@ -304,52 +355,76 @@ const TeamAttachmentList = (props) => {
       >
         {
           data.map((item, index) => {
-            if (index < 4) {
-              return (
+            // for response image => item.payload
+            let fileInfo = item.fileInfo
+            // if (index < 4) {
+            return (
 
-                <TouchableWithoutFeedback
-                  onPress={() => {
-                    onAttachmentPressed(index);
+              <TouchableWithoutFeedback
+                onPress={() => {
+                  onAttachmentPressed(index);
+                }}
+              >
+                <View
+                  key={`${index}`}
+                  style={{
+                    marginTop: 1,
                   }}
                 >
-                  <View
-                    key={`${index}`}
-                    style={{
-                      marginTop: 1
-                    }}
-                  >
-                    {
-                      item.payload.fileType.toLowerCase().includes("image") ?
-                        <ImagePost
+                  <TouchableWithoutFeedback onPress={() => removeItem(item)}>
+                    <View style={{
+                      position: 'absolute',
+                      top: 5,
+                      right: 5,
+                      zIndex: 1,
+                      backgroundColor: colors.primary,
+                      height: getHeightPixel(25),
+                      width: getHeightPixel(25),
+                      borderRadius: getHeightPixel(12.5),
+                      justifyContent: 'center',
+                      alignItems: 'center'
+                    }}>
+                      <Image source={icons.Cross}
+                        resizeMode='contain'
+                        style={{
+                          tintColor: 'white',
+                          height: getHeightPixel(10),
+                          width: getHeightPixel(10)
+                        }} />
+                    </View>
+                  </TouchableWithoutFeedback>
+                  {
+                    fileInfo.fileType.toLowerCase().includes("image") ?
+                      <ImagePost
+                        item={item}
+                        size={calculateWidthHeight(index)}
+                      /> :
+                      fileInfo.fileType.toLowerCase().includes("video") ?
+                        <VideoPost
                           item={item}
                           size={calculateWidthHeight(index)}
+                          onPress={() => {
+                            onAttachmentPressed(index);
+                          }}
+
                         /> :
-                        item.payload.fileType.toLowerCase().includes("video") ?
-                          <VideoPost
+                        fileInfo.fileType.toLowerCase().includes("application") ?
+                          <AttachmentPost
                             item={item}
                             size={calculateWidthHeight(index)}
-                            onPress={() => {
-                              onAttachmentPressed(index);
-                            }}
-
-                          /> :
-                          item.payload.fileType.toLowerCase().includes("application") ?
-                            <AttachmentPost
-                              item={item}
-                              size={calculateWidthHeight(index)}
-                            /> : null
-                    }
-                    {
+                          /> : null
+                  }
+                  {/* {
                       (index == 3 && data.length > 4) &&
                       endView()
-                    }
-                  </View>
-                </TouchableWithoutFeedback>
-              )
-            }
-            else {
-              return null
-            }
+                    } */}
+                </View>
+              </TouchableWithoutFeedback>
+            )
+            // }
+            // else {
+            //   return null
+            // }
           })
         }
       </View >

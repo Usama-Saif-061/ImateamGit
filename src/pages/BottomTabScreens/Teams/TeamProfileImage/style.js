@@ -57,8 +57,6 @@ const styles = StyleSheet.create({
     color: colors.accentGray,
   },
   upload: {
-    marginLeft: getWidthPixel(20),
-    marginBottom: getHeightPixel(10),
     ...font(15, "500")
   },
 });
