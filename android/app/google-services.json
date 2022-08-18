@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "269996969919",
+    "project_id": "ima-team",
+    "storage_bucket": "ima-team.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:269996969919:android:03839a64fe3e597fc8db0a",
+        "android_client_info": {
+          "package_name": "com.imateam.us"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "269996969919-9et6lo460v43gg28rplkh7gee36hruje.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDXQAjcT60dtYjfFIaAISs_UGwFJpvRW1A"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "269996969919-9et6lo460v43gg28rplkh7gee36hruje.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,0 +1,489 @@
+diff --git a/node_modules/react-native-week-view/src/Event/Event.js b/node_modules/react-native-week-view/src/Event/Event.js
+index b2dd1e6..73ef2cf 100644
+--- a/node_modules/react-native-week-view/src/Event/Event.js
++++ b/node_modules/react-native-week-view/src/Event/Event.js
+@@ -18,6 +18,7 @@ const Event = ({
+   EventComponent,
+   containerStyle,
+   onDrag,
++  index,
+ }) => {
+   const isDragEnabled = !!onDrag;
+ 
+@@ -89,18 +90,18 @@ const Event = ({
+       },
+     });
+   }, [onDragRelease, isDragEnabled, isPressDisabled]);
+-
++  console.log("current left is ",currentLeft)
+   return (
+     <Animated.View
+       style={[
+-        styles.container,
++        // styles.container,
+         {
+-          top: position.top,
+-          left: currentLeft,
+-          height: position.height,
+-          width: currentWidth,
++          // top: position.top + 5,
++          // left: currentLeft + 5,
++          // height: position.height,
++          // width: currentWidth,
+           backgroundColor: event.color,
+-          transform: translatedByDrag.getTranslateTransform(),
++          // transform: translatedByDrag.getTranslateTransform(),
+         },
+         containerStyle,
+       ]}
+diff --git a/node_modules/react-native-week-view/src/Event/Event.styles.js b/node_modules/react-native-week-view/src/Event/Event.styles.js
+index bfb2d82..71e513a 100644
+--- a/node_modules/react-native-week-view/src/Event/Event.styles.js
++++ b/node_modules/react-native-week-view/src/Event/Event.styles.js
+@@ -10,14 +10,14 @@ const styles = StyleSheet.create({
+   },
+   touchableContainer: {
+     flex: 1,
+-    alignSelf: 'stretch',
+   },
+   description: {
+-    marginVertical: 8,
+-    marginHorizontal: 2,
+-    color: '#fff',
++    color: '#FFFFFF',
+     textAlign: 'center',
+-    fontSize: 15,
++    fontSize: 10,
++    fontFamily : "Poppins",
++    fontWeight : "400",
++    lineHeight :20
+   },
+ });
+ 
+diff --git a/node_modules/react-native-week-view/src/Events/Events.js b/node_modules/react-native-week-view/src/Events/Events.js
+index 60ec4ec..6456129 100644
+--- a/node_modules/react-native-week-view/src/Events/Events.js
++++ b/node_modules/react-native-week-view/src/Events/Events.js
+@@ -296,18 +296,38 @@ class Events extends PureComponent {
+                     width={this.getEventItemWidth(false)}
+                   />
+                 )}
+-                {eventsInSection.map((item) => (
+-                  <Event
+-                    key={item.data.id}
+-                    event={item.data}
+-                    position={item.style}
+-                    onPress={onEventPress}
+-                    onLongPress={onEventLongPress}
+-                    EventComponent={EventComponent}
+-                    containerStyle={eventContainerStyle}
+-                    onDrag={onDragEvent && this.onDragEvent}
+-                  />
+-                ))}
++                <View
++                style = {{
++                  flexDirection : "row",
++                  height : 50,
++                  alignItems : "center",
++                  justifyContent : "space-around"
++                }}
++                >
++                {eventsInSection.map((item,index) => {
++                  console.log(index)
++                  if (index < 3) {
++                    return (
++                      <Event
++                      index={index}
++                        key={item.data.id}
++                        event={item.data}
++                        position={item.style}
++                        onPress={onEventPress}
++                        onLongPress={onEventLongPress}
++                        EventComponent={EventComponent}
++                        containerStyle={{
++                          ...eventContainerStyle,
++                          borderRadius : 7,
++                          height : 40,
++                          width : "25%"
++                        }}
++                        onDrag={onDragEvent && this.onDragEvent}
++                      />
++                    )
++                  }
++                 })}
++                </View>
+               </View>
+             </TouchableWithoutFeedback>
+           ))}
+diff --git a/node_modules/react-native-week-view/src/Events/Events.styles.js b/node_modules/react-native-week-view/src/Events/Events.styles.js
+index 2fe0ac1..04ae38d 100644
+--- a/node_modules/react-native-week-view/src/Events/Events.styles.js
++++ b/node_modules/react-native-week-view/src/Events/Events.styles.js
+@@ -1,7 +1,7 @@
+ import { StyleSheet } from 'react-native';
+ import { CONTAINER_WIDTH, CONTENT_OFFSET } from '../utils';
+ 
+-const GREY_COLOR = '#E9EDF0';
++const GREY_COLOR = '#E2E3E4';
+ 
+ const styles = StyleSheet.create({
+   container: {
+@@ -10,7 +10,7 @@ const styles = StyleSheet.create({
+     width: CONTAINER_WIDTH,
+   },
+   timeRow: {
+-    flex: 0,
++    flex: 1,
+     borderTopWidth: 1,
+     borderColor: GREY_COLOR,
+     backgroundColor: 'transparent',
+@@ -18,7 +18,9 @@ const styles = StyleSheet.create({
+   eventsColumn: {
+     flex: 1,
+     borderColor: GREY_COLOR,
+-    borderLeftWidth: 1,
++    borderLeftWidth: 0.5,
++    borderRightWidth : 0.5,
++    marginLeft : 0
+   },
+   eventsContainer: {
+     position: 'absolute',
+@@ -27,7 +29,6 @@ const styles = StyleSheet.create({
+     right: 0,
+     bottom: 0,
+     top: 0,
+-    backgroundColor: 'transparent',
+   },
+ });
+ 
+diff --git a/node_modules/react-native-week-view/src/Header/Header.js b/node_modules/react-native-week-view/src/Header/Header.js
+index 997481b..d9fa174 100644
+--- a/node_modules/react-native-week-view/src/Header/Header.js
++++ b/node_modules/react-native-week-view/src/Header/Header.js
+@@ -18,7 +18,12 @@ const getDayTextStyles = (numberOfDays) => {
+ };
+ 
+ const DefaultDayComponent = ({ textStyle, formattedDate }) => (
+-  <Text style={textStyle}>{formattedDate}</Text>
++  <Text style={{...textStyle,
++    textStyle : "center",
++    fontFamily : "Segoe UI",
++    fontSize : 11,
++    fontWeight : "600"
++  }}>{formattedDate}</Text>
+ );
+ 
+ const Column = ({
+@@ -69,7 +74,11 @@ const Columns = ({
+         return (
+           <Column
+             style={style}
+-            textStyle={textStyle}
++            textStyle={
++              {
++            
++            }
++          }
+             key={column}
+             column={column}
+             numberOfDays={numberOfDays}
+@@ -127,7 +136,7 @@ WeekViewHeader.propTypes = {
+ };
+ 
+ WeekViewHeader.defaultProps = {
+-  formatDate: 'MMM D',
++  formatDate: 'dd DD',
+ };
+ 
+ export default React.memo(WeekViewHeader);
+diff --git a/node_modules/react-native-week-view/src/Header/Header.styles.js b/node_modules/react-native-week-view/src/Header/Header.styles.js
+index 0b91cd3..1573f57 100644
+--- a/node_modules/react-native-week-view/src/Header/Header.styles.js
++++ b/node_modules/react-native-week-view/src/Header/Header.styles.js
+@@ -11,11 +11,9 @@ const styles = StyleSheet.create({
+     flexDirection: 'row',
+   },
+   column: {
+-    flex: 1,
+     alignItems: 'center',
+     justifyContent: 'center',
+-    borderTopWidth: 1,
+-    borderLeftWidth: 1,
++    flex : 1,
+   },
+ });
+ 
+diff --git a/node_modules/react-native-week-view/src/Times/Times.styles.js b/node_modules/react-native-week-view/src/Times/Times.styles.js
+index 5503b97..efc1c8e 100644
+--- a/node_modules/react-native-week-view/src/Times/Times.styles.js
++++ b/node_modules/react-native-week-view/src/Times/Times.styles.js
+@@ -2,15 +2,17 @@ import { StyleSheet } from 'react-native';
+ 
+ const styles = StyleSheet.create({
+   columnContainer: {
+-    paddingTop: 10,
+-    width: 60,
+-  },
+-  label: {
+-    flex: -1,
++    width: 50,
++    justifyContent :"center",
++    alignItems : "flex-start",
+   },
+   text: {
+-    fontSize: 12,
+-    textAlign: 'center',
++    fontSize: 9,
++    textAlign: 'left',
++    fontFamily : "Segoe UI",
++    color : "rgba(119, 136, 153, 1)",
++    fontWeight : "400",
++    paddingTop : 36,
+   },
+ });
+ 
+diff --git a/node_modules/react-native-week-view/src/Title/Title.js b/node_modules/react-native-week-view/src/Title/Title.js
+index 89392ac..f9ef818 100644
+--- a/node_modules/react-native-week-view/src/Title/Title.js
++++ b/node_modules/react-native-week-view/src/Title/Title.js
+@@ -26,10 +26,12 @@ const Title = ({
+       disabled={!onMonthPress}
+     >
+       <Text
++      numberOfLines={1}
+         style={[
+           {
+             fontSize: getFontSizeHeader(numberOfDays),
+-            textAlign: 'center',
++            textAlign: 'left',
++            width : 200,
+           },
+           textStyle,
+         ]}
+diff --git a/node_modules/react-native-week-view/src/Title/Title.styles.js b/node_modules/react-native-week-view/src/Title/Title.styles.js
+index 208414f..3c1796c 100644
+--- a/node_modules/react-native-week-view/src/Title/Title.styles.js
++++ b/node_modules/react-native-week-view/src/Title/Title.styles.js
+@@ -3,9 +3,7 @@ import { StyleSheet } from 'react-native';
+ const styles = StyleSheet.create({
+   title: {
+     justifyContent: 'center',
+-    alignItems: 'center',
+-    width: 60,
+-    borderTopWidth: 1,
++    alignItems: 'flex-start',
+   },
+ });
+ 
+diff --git a/node_modules/react-native-week-view/src/WeekView/WeekView.js b/node_modules/react-native-week-view/src/WeekView/WeekView.js
+index c80a76b..ba902fb 100644
+--- a/node_modules/react-native-week-view/src/WeekView/WeekView.js
++++ b/node_modules/react-native-week-view/src/WeekView/WeekView.js
+@@ -24,6 +24,8 @@ import {
+   setLocale,
+   CONTAINER_WIDTH,
+ } from '../utils';
++import { getHeightPixel, getWidthPixel } from '../../../../src/common/helper';
++import colors from '../../../../src/common/colors';
+ 
+ const MINUTES_IN_DAY = 60 * 24;
+ 
+@@ -76,9 +78,9 @@ export default class WeekView extends Component {
+ 
+       this.currentPageIndex = this.pageOffset;
+       this.setState({
+-          currentMoment: moment(initialDates[this.currentPageIndex]).toDate(),
+-          initialDates,
+-        },
++        currentMoment: moment(initialDates[this.currentPageIndex]).toDate(),
++        initialDates,
++      },
+         () => {
+           this.eventsGrid.scrollToIndex({
+             index: this.pageOffset,
+@@ -184,7 +186,7 @@ export default class WeekView extends Component {
+     };
+ 
+     const newState = {};
+-    let newStateCallback = () => {};
++    let newStateCallback = () => { };
+     // The final target may change, if pages are added
+     let targetIndex = target;
+ 
+@@ -245,7 +247,7 @@ export default class WeekView extends Component {
+       const newState = {
+         currentMoment: newMoment,
+       };
+-      let newStateCallback = () => {};
++      let newStateCallback = () => { };
+ 
+       if (movedPages < 0 && newPage < this.pageOffset) {
+         this.prependPagesInPlace(initialDates, 1);
+@@ -317,6 +319,7 @@ export default class WeekView extends Component {
+     // For example: { "2020-02-03": [event1, event2, ...] }
+     // If an event spans through multiple days, adds the event multiple times
+     const sortedEvents = {};
++    console.log("events is",events)
+     events.forEach((event) => {
+       // in milliseconds
+       const originalDuration =
+@@ -358,8 +361,8 @@ export default class WeekView extends Component {
+   });
+ 
+   getListItemLayout = (index) => ({
+-    length: CONTAINER_WIDTH,
+-    offset: CONTAINER_WIDTH * index,
++    length: CONTAINER_WIDTH ,
++    offset: (CONTAINER_WIDTH * index),
+     index,
+   });
+ 
+@@ -405,15 +408,28 @@ export default class WeekView extends Component {
+ 
+     return (
+       <View style={styles.container}>
+-        <View style={styles.headerContainer}>
+-          <Title
+-            showTitle={showTitle}
+-            style={headerStyle}
+-            textStyle={headerTextStyle}
+-            numberOfDays={numberOfDays}
+-            selectedDate={currentMoment}
+-            onMonthPress={onMonthPress}
+-          />
++        <Title
++          showTitle={showTitle}
++          style={{
++            width : 150,
++            alignItems : "flex-start",
++            justifyContent : "center",
++            marginTop : 10,
++          }}
++          textStyle={
++            {
++               color: colors.mineShaft, fontSize: getHeightPixel(24), fontFamily: 'Segoe UI Bold',
++              }
++          }
++          numberOfDays={numberOfDays}
++          selectedDate={currentMoment}
++          onMonthPress={onMonthPress}
++        />
++        <View style={{
++          ...styles.headerContainer,
++          marginLeft : 51,
++          marginTop : 15
++        }}>
+           <VirtualizedList
+             horizontal
+             pagingEnabled
+@@ -429,9 +445,13 @@ export default class WeekView extends Component {
+             initialScrollIndex={this.pageOffset}
+             renderItem={({ item }) => {
+               return (
+-                <View key={item} style={styles.header}>
++                <View key={item} style={{
++                  ...styles.header,
++                }}>
+                   <Header
+-                    style={headerStyle}
++                    style={{
++                      ...headerStyle,
++                    }}
+                     textStyle={headerTextStyle}
+                     TodayComponent={TodayHeaderComponent}
+                     DayComponent={DayHeaderComponent}
+@@ -440,6 +460,7 @@ export default class WeekView extends Component {
+                     numberOfDays={numberOfDays}
+                     rightToLeft={rightToLeft}
+                     onDayPress={onDayPress}
++
+                   />
+                 </View>
+               );
+@@ -454,10 +475,15 @@ export default class WeekView extends Component {
+           onMoveShouldSetResponderCapture={() => false}
+           onResponderTerminationRequest={() => false}
+           ref={this.verticalAgendaRef}>
+-          <View style={styles.scrollViewContent}>
++          <View style={{
++            ...styles.scrollViewContent,
++          }}>
+             <Times
+               times={times}
+-              textStyle={hourTextStyle}
++              textStyle={{
++                ...hourTextStyle,
++                
++              }}
+               hoursInDisplay={hoursInDisplay}
+               timeStep={timeStep}
+             />
+@@ -473,6 +499,7 @@ export default class WeekView extends Component {
+               onMoveShouldSetResponderCapture={() => false}
+               onResponderTerminationRequest={() => false}
+               renderItem={({ item }) => {
++                console.log(item)
+                 return (
+                   <Events
+                     times={times}
+@@ -487,8 +514,10 @@ export default class WeekView extends Component {
+                     timeStep={timeStep}
+                     EventComponent={EventComponent}
+                     eventContainerStyle={eventContainerStyle}
+-                    gridRowStyle={gridRowStyle}
+-                    gridColumnStyle={gridColumnStyle}
++                    gridRowStyle={{
++                    }}
++                    gridColumnStyle={{
++                    }}
+                     rightToLeft={rightToLeft}
+                     showNowLine={showNowLine}
+                     nowLineColor={nowLineColor}
+@@ -568,7 +597,7 @@ WeekView.defaultProps = {
+   hoursInDisplay: 6,
+   weekStartsOn: 1,
+   timeStep: 60,
+-  formatTimeLabel: 'H:mm',
++  formatTimeLabel: 'hh:mm A',
+   startHour: 8,
+   showTitle: true,
+   rightToLeft: false,
+diff --git a/node_modules/react-native-week-view/src/WeekView/WeekView.styles.js b/node_modules/react-native-week-view/src/WeekView/WeekView.styles.js
+index 06592e9..3f35adc 100644
+--- a/node_modules/react-native-week-view/src/WeekView/WeekView.styles.js
++++ b/node_modules/react-native-week-view/src/WeekView/WeekView.styles.js
+@@ -13,7 +13,7 @@ const styles = StyleSheet.create({
+   },
+   header: {
+     flex: 1,
+-    height: 50,
++    height: 40,
+     justifyContent: 'center',
+     alignItems: 'center',
+     width: CONTAINER_WIDTH,
+diff --git a/node_modules/react-native-week-view/src/utils.js b/node_modules/react-native-week-view/src/utils.js
+index 19d840f..e7e975c 100644
+--- a/node_modules/react-native-week-view/src/utils.js
++++ b/node_modules/react-native-week-view/src/utils.js
+@@ -2,9 +2,9 @@ import { Dimensions } from 'react-native';
+ import moment from 'moment';
+ 
+ const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
+-export const CONTENT_OFFSET = 16;
+-export const CONTAINER_HEIGHT = SCREEN_HEIGHT - 60;
+-export const CONTAINER_WIDTH = SCREEN_WIDTH - 60;
++export const CONTENT_OFFSET = 0;
++export const CONTAINER_HEIGHT = 300;
++export const CONTAINER_WIDTH = SCREEN_WIDTH - 80;
+ export const DATE_STR_FORMAT = 'YYYY-MM-DD';
+ export const availableNumberOfDays = [1, 3, 5, 7];
+ 
+@@ -33,7 +33,7 @@ export const addLocale = (locale, obj) => {
+ };
+ 
+ export const getCurrentMonth = (date) => {
+-  return moment(date).format('MMMM Y');
++  return moment(date).format('MMM Y');
+ };
+ 
+ export const calculateDaysArray = (date, numberOfDays, rightToLeft) => {

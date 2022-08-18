@@ -1,0 +1,110 @@
+diff --git a/node_modules/react-native-places-input/index.js b/node_modules/react-native-places-input/index.js
+index ffa45ae..646e5b5 100755
+--- a/node_modules/react-native-places-input/index.js
++++ b/node_modules/react-native-places-input/index.js
+@@ -1,4 +1,4 @@
+-import React, {Component} from 'react';
++import React, { Component } from 'react';
+ import PropTypes from 'prop-types';
+ import {
+   ActivityIndicator,
+@@ -8,6 +8,7 @@ import {
+   TouchableOpacity,
+   View,
+ } from 'react-native';
++import colors from '../../src/common/colors';
+ 
+ class PlacesInput extends Component {
+   state = {
+@@ -42,16 +43,17 @@ class PlacesInput extends Component {
+       <View style={[styles.container, this.props.stylesContainer]}>
+         <TextInput
+           placeholder={this.props.placeHolder}
+-          style={[styles.input, this.props.stylesInput]}
++          placeholderTextColor={colors.gray}
++          style={[styles.input, this.props.stylesInput, { color: colors.mineShaft }]}
+           onChangeText={query => {
+-            this.setState({query}, () => {
++            this.setState({ query }, () => {
+               this.onPlaceSearch();
+               this.props.onChangeText && this.props.onChangeText(query, this);
+             });
+           }}
+           value={this.state.query}
+-          onFocus={() => this.setState({showList: true})}
+-          onBlur={() => this.setState({showList: false})}
++          onFocus={() => this.setState({ showList: true })}
++          onBlur={() => this.setState({ showList: false })}
+           {...this.props.textInputProps}
+           clearButtonMode="always"
+         />
+@@ -94,7 +96,7 @@ class PlacesInput extends Component {
+   };
+ 
+   buildCountryQuery = () => {
+-    const {queryCountries} = this.props;
++    const { queryCountries } = this.props;
+ 
+     if (!queryCountries) {
+       return '';
+@@ -106,7 +108,7 @@ class PlacesInput extends Component {
+   };
+ 
+   buildLocationQuery = () => {
+-    const {searchLatitude, searchLongitude, searchRadius} = this.props;
++    const { searchLatitude, searchLongitude, searchRadius } = this.props;
+ 
+     if (!searchLatitude || !searchLongitude || !searchRadius) {
+       return '';
+@@ -116,7 +118,7 @@ class PlacesInput extends Component {
+   };
+ 
+   buildTypesQuery = () => {
+-    const {queryTypes} = this.props;
++    const { queryTypes } = this.props;
+ 
+     if (!queryTypes) {
+       return '';
+@@ -126,7 +128,7 @@ class PlacesInput extends Component {
+   };
+ 
+   buildSessionQuery = () => {
+-    const {querySession} = this.props;
++    const { querySession } = this.props;
+ 
+     if (querySession) {
+       return `&sessiontoken=${querySession}`
+@@ -149,12 +151,9 @@ class PlacesInput extends Component {
+       },
+       async () => {
+         const places = await fetch(
+-          `https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${
+-            this.state.query
+-          }&key=${this.props.googleApiKey}&inputtype=textquery&language=${
+-            this.props.language
+-          }&fields=${
+-            this.props.queryFields
++          `https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${this.state.query
++          }&key=${this.props.googleApiKey}&inputtype=textquery&language=${this.props.language
++          }&fields=${this.props.queryFields
+           }${this.buildLocationQuery()}${this.buildCountryQuery()}${this.buildTypesQuery()}${this.buildSessionQuery()}`
+         ).then(response => response.json());
+ 
+@@ -167,7 +166,7 @@ class PlacesInput extends Component {
+   };
+ 
+   onPlaceSelect = async (id, passedPlace) => {
+-    const {clearQueryOnSelect} = this.props;
++    const { clearQueryOnSelect } = this.props;
+ 
+     this.setState({
+       isLoading: true,
+@@ -268,7 +267,7 @@ const styles = StyleSheet.create({
+     shadowOpacity: 0.25,
+     shadowRadius: 3.84,
+ 
+-    elevation: 5,
++    // elevation: 5,
+   },
+   input: {
+     height: 50,

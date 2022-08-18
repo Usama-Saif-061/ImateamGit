@@ -1,0 +1,439 @@
+diff --git a/node_modules/react-native-calendars/src/calendar/day/basic/index.js b/node_modules/react-native-calendars/src/calendar/day/basic/index.js
+index dbb6832..f2472ed 100644
+--- a/node_modules/react-native-calendars/src/calendar/day/basic/index.js
++++ b/node_modules/react-native-calendars/src/calendar/day/basic/index.js
+@@ -36,21 +36,27 @@ const BasicDay = (props) => {
+         const { customStyles, selectedColor } = _marking;
+         const styles = [style.current.base];
+         if (isSelected) {
+-            styles.push(style.current.selected);
++            // styles.push(style.current.selected);
+             if (selectedColor) {
+-                styles.push({ backgroundColor: selectedColor });
++                // styles.push({ backgroundColor: selectedColor, borderRadius: 0 });
+             }
+         }
+         else if (isToday) {
+             styles.push(style.current.today);
+         }
+         //Custom marking type
+-        if (isCustom && customStyles && customStyles.container) {
+-            if (customStyles.container.borderRadius === undefined) {
+-                customStyles.container.borderRadius = 16;
+-            }
+-            styles.push(customStyles.container);
+-        }
++        // if (isCustom && customStyles && customStyles.container) {
++        //     if (customStyles.container.borderRadius === undefined) {
++        //         customStyles.container.borderRadius = 16;
++        //     }
++        //     styles.push(customStyles.container);
++        // }
++        styles.push({
++            zIndex: 1,
++            backgroundColor: "transparent",
++            paddingLeft: 15
++        })
++        console.log("view style is ")
+         return styles;
+     };
+     const getTextStyle = () => {
+@@ -75,6 +81,7 @@ const BasicDay = (props) => {
+         if (isCustom && customStyles && customStyles.text) {
+             styles.push(customStyles.text);
+         }
++        console.log(styles)
+         return styles;
+     };
+     const _onPress = useCallback(() => {
+@@ -84,31 +91,66 @@ const BasicDay = (props) => {
+         onLongPress?.(dateData);
+     }, [onLongPress, date]);
+     const renderMarking = () => {
+-        const { marked, dotColor, dots, periods } = _marking;
+-        return (<Marking type={markingType} theme={theme} marked={isMultiDot ? true : marked} selected={isSelected} disabled={isDisabled} inactive={isInactive} today={isToday} dotColor={dotColor} dots={dots} periods={periods}/>);
++        const { marked, dotColor, dots, periods,colorList} = _marking;
++        return (
++            <View
++            style = {{
++                marginTop : 10
++            }}
++            >
++                <Marking type={markingType} theme={theme} marked={isMultiDot ? true : marked} selected={isSelected} disabled={isDisabled} inactive={isInactive} today={isToday} dotColor={dotColor} dots={dots} periods={periods} colorList = {colorList} />
++
++            </View>
++        );
+     };
+     const renderText = () => {
+         return (<Text allowFontScaling={false} style={getTextStyle()}>
+-        {String(children)}
+-      </Text>);
++            {String(children)}
++        </Text>);
+     };
+     const renderContent = () => {
+         return (<Fragment>
+-        {renderText()}
+-        {renderMarking()}
+-      </Fragment>);
++            {renderText()}
++            {renderMarking()}
++        </Fragment>);
+     };
+     const renderContainer = () => {
+         const { activeOpacity } = _marking;
+-        return (<TouchableOpacity testID={testID} style={getContainerStyle()} disabled={shouldDisableTouchEvent()} activeOpacity={activeOpacity} onPress={!shouldDisableTouchEvent() ? _onPress : undefined} onLongPress={!shouldDisableTouchEvent() ? _onLongPress : undefined} accessible accessibilityRole={isDisabled ? undefined : 'button'} accessibilityLabel={accessibilityLabel}>
+-        {isMultiPeriod ? renderText() : renderContent()}
+-      </TouchableOpacity>);
++        console.log(isCustom)
++        return (
++            <View
++                style={{
++                    flex: 1,
++                    width: "100%"
++                }}
++            >
++
++                {
++                    (isSelected && isCustom) &&
++                    <View
++                        style={{
++                            position: "absolute",
++                            zIndex: 0,
++                            backgroundColor: "rgba(16,110,191,0.1)",
++                            top: 0,
++                            bottom: 0,
++                            left: 0,
++                            right: 0,
++                        }}
++                    >
++                    </View>
++                }
++                <TouchableOpacity testID={testID} style={getContainerStyle()} disabled={shouldDisableTouchEvent()} activeOpacity={activeOpacity} onPress={!shouldDisableTouchEvent() ? _onPress : undefined} onLongPress={!shouldDisableTouchEvent() ? _onLongPress : undefined} accessible accessibilityRole={isDisabled ? undefined : 'button'} accessibilityLabel={accessibilityLabel}>
++                    {isMultiPeriod ? renderText() : renderContent()}
++                </TouchableOpacity>
++            </View>
++        );
+     };
+     const renderPeriodsContainer = () => {
+         return (<View style={style.current.container}>
+-        {renderContainer()}
+-        {renderMarking()}
+-      </View>);
++            {renderContainer()}
++            {renderMarking()}
++        </View>);
+     };
+     return isMultiPeriod ? renderPeriodsContainer() : renderContainer();
+ };
+diff --git a/node_modules/react-native-calendars/src/calendar/day/index.js b/node_modules/react-native-calendars/src/calendar/day/index.js
+index 9142f29..641663f 100644
+--- a/node_modules/react-native-calendars/src/calendar/day/index.js
++++ b/node_modules/react-native-calendars/src/calendar/day/index.js
+@@ -8,6 +8,7 @@ import { xdateToData } from '../../interface';
+ import { SELECT_DATE_SLOT } from '../../testIDs';
+ import BasicDay from './basic';
+ import PeriodDay from './period';
++import { View } from 'react-native';
+ const Day = React.memo((props) => {
+     const { date, marking, dayComponent, markingType } = props;
+     const _date = date ? new XDate(date) : undefined;
+@@ -47,10 +48,11 @@ const Day = React.memo((props) => {
+     const Component = dayComponent || (markingType === 'period' ? PeriodDay : BasicDay);
+     const dayComponentProps = dayComponent ? { date: xdateToData(date ? new XDate(date) : new XDate()) } : undefined;
+     return (
+-    //@ts-expect-error
+-    <Component {...props} accessibilityLabel={getAccessibilityLabel} testID={`${SELECT_DATE_SLOT}-${date}`} {...dayComponentProps}>
+-      {formatNumbers(_date?.getDate())}
+-    </Component>);
++        //@ts-expect-error
++            <Component {...props} accessibilityLabel={getAccessibilityLabel} testID={`${SELECT_DATE_SLOT}-${date}`} {...dayComponentProps}>
++                {formatNumbers(_date?.getDate())}
++            </Component>
++    );
+ });
+ export default Day;
+ Day.displayName = 'Day';
+diff --git a/node_modules/react-native-calendars/src/calendar/day/marking/index.d.ts b/node_modules/react-native-calendars/src/calendar/day/marking/index.d.ts
+index 4434788..b139320 100644
+--- a/node_modules/react-native-calendars/src/calendar/day/marking/index.d.ts
++++ b/node_modules/react-native-calendars/src/calendar/day/marking/index.d.ts
+@@ -7,7 +7,7 @@ export declare enum Markings {
+     MULTI_DOT = "multi-dot",
+     PERIOD = "period",
+     MULTI_PERIOD = "multi-period",
+-    CUSTOM = "custom"
++    CUSTOM = "custom",
+ }
+ declare type CustomStyle = {
+     container?: ViewStyle;
+@@ -45,6 +45,7 @@ export interface MarkingProps extends DotProps {
+     endingDay?: boolean;
+     accessibilityLabel?: string;
+     customStyles?: CustomStyle;
++    colorList : [string]
+ }
+ declare const Marking: {
+     (props: MarkingProps): JSX.Element;
+diff --git a/node_modules/react-native-calendars/src/calendar/day/marking/index.js b/node_modules/react-native-calendars/src/calendar/day/marking/index.js
+index 546978a..b627f00 100644
+--- a/node_modules/react-native-calendars/src/calendar/day/marking/index.js
++++ b/node_modules/react-native-calendars/src/calendar/day/marking/index.js
+@@ -1,6 +1,6 @@
+ import filter from 'lodash/filter';
+ import React, { useRef } from 'react';
+-import { View } from 'react-native';
++import { View,Text } from 'react-native';
+ import { extractComponentProps } from '../../../componentUpdater';
+ import styleConstructor from './style';
+ import Dot from '../dot';
+@@ -13,7 +13,10 @@ export var Markings;
+     Markings["CUSTOM"] = "custom";
+ })(Markings || (Markings = {}));
+ const Marking = (props) => {
+-    const { theme, type, dots, periods, selected, dotColor } = props;
++    const { theme, type, dots, periods, selected, dotColor,colorList } = props;
++    if (colorList) {
++        console.log("colors is ",colorList)
++    }
+     const style = useRef(styleConstructor(theme));
+     const getItems = (items) => {
+         if (items && Array.isArray(items) && items.length > 0) {
+@@ -33,7 +36,61 @@ const Marking = (props) => {
+             case Markings.MULTI_PERIOD:
+                 return renderMultiMarkings(style.current.periods, periods);
+             default:
+-                return renderDot();
++                return colorList && colorList.length > 0 ?
++                <View
++                style = {{
++                    width : 52,
++                    height : 43,
++                    flexDirection : "row",
++                    alignItems : "flex-end",
++                    flexWrap : "wrap",
++                    justifyContent :  "space-around",
++                    paddingRight : 5,
++                    alignItems : "center"
++                }}
++                >
++                    {
++                        colorList.map((item,index)=>{
++                            if (index < 5) {
++                                return <View
++                                style = {{
++                                    backgroundColor : item,
++                                    height : 9,
++                                    width : 9,
++                                    borderRadius : 4.5,
++                                    marginLeft : 5,
++                                    marginTop : 8
++                                }}
++                                />
++                            }
++                            if (index == 5) {
++                                return <Text
++                                style = {{
++                                    fontSize : 10,
++                                    color : "black"
++                                }}
++                                >
++                                    {
++                                        `+${
++                                            colorList.length - 5 
++                                        }`
++                                    }
++                                </Text>
++                            }
++                            return null
++                        })
++                    }
++                </View>
++                :
++                 <View
++                 style = {{
++                     marginTop : 10
++                 }}
++                 >
++                     {
++                         renderDot()
++                     }
++                 </View>
+         }
+     };
+     const renderMultiMarkings = (containerStyle, items) => {
+diff --git a/node_modules/react-native-calendars/src/calendar/header/index.js b/node_modules/react-native-calendars/src/calendar/header/index.js
+index ad35a94..0088100 100644
+--- a/node_modules/react-native-calendars/src/calendar/header/index.js
++++ b/node_modules/react-native-calendars/src/calendar/header/index.js
+@@ -4,9 +4,10 @@ import XDate from 'xdate';
+ import React, { Fragment, useCallback, useMemo, forwardRef, useImperativeHandle, useRef } from 'react';
+ import { ActivityIndicator, Platform, View, Text, TouchableOpacity, Image } from 'react-native';
+ import { formatNumbers, weekDayNames } from '../../dateutils';
+-import { CHANGE_MONTH_LEFT_ARROW, CHANGE_MONTH_RIGHT_ARROW, HEADER_DAY_NAMES, HEADER_LOADING_INDICATOR, HEADER_MONTH_NAME
+-// @ts-expect-error
+- } from '../../testIDs';
++import {
++    CHANGE_MONTH_LEFT_ARROW, CHANGE_MONTH_RIGHT_ARROW, HEADER_DAY_NAMES, HEADER_LOADING_INDICATOR, HEADER_MONTH_NAME
++    // @ts-expect-error
++} from '../../testIDs';
+ import styleConstructor from './style';
+ const accessibilityActions = [
+     { name: 'increment', label: 'increment' },
+@@ -63,8 +64,8 @@ const CalendarHeader = forwardRef((props, ref) => {
+                 dayStyle.push(style[dayTextAtIndex]);
+             }
+             return (<Text allowFontScaling={false} key={index} style={dayStyle} numberOfLines={1} accessibilityLabel={''}>
+-          {day}
+-        </Text>);
++                {day}
++            </Text>);
+         });
+     }, [firstDay]);
+     const _renderHeader = () => {
+@@ -76,10 +77,10 @@ const CalendarHeader = forwardRef((props, ref) => {
+             return customHeaderTitle;
+         }
+         return (<Fragment>
+-        <Text allowFontScaling={false} style={style.current.monthText} testID={testID ? `${HEADER_MONTH_NAME}-${testID}` : HEADER_MONTH_NAME} {...webProps}>
+-          {formatNumbers(month?.toString(monthFormat))}
+-        </Text>
+-      </Fragment>);
++            <Text allowFontScaling={false} style={style.current.monthText} testID={testID ? `${HEADER_MONTH_NAME}-${testID}` : HEADER_MONTH_NAME} {...webProps}>
++                {formatNumbers(month?.toString(monthFormat))}
++            </Text>
++        </Fragment>);
+     };
+     const _renderArrow = (direction) => {
+         if (hideArrows) {
+@@ -93,39 +94,43 @@ const CalendarHeader = forwardRef((props, ref) => {
+         const renderArrowDirection = isLeft ? 'left' : 'right';
+         const shouldDisable = isLeft ? disableArrowLeft : disableArrowRight;
+         return (<TouchableOpacity onPress={!shouldDisable ? onPress : undefined} disabled={shouldDisable} style={style.current.arrow} hitSlop={{ left: 20, right: 20, top: 20, bottom: 20 }} testID={testId}>
+-        {renderArrow ? (renderArrow(renderArrowDirection)) : (
+-            // @ts-expect-error style?: StyleProp<ImageStyle>
+-            <Image source={imageSource} style={shouldDisable ? style.current.disabledArrowImage : style.current.arrowImage}/>)}
+-      </TouchableOpacity>);
++            {renderArrow ? (renderArrow(renderArrowDirection)) : (
++                // @ts-expect-error style?: StyleProp<ImageStyle>
++                <Image source={imageSource} style={shouldDisable ? style.current.disabledArrowImage : style.current.arrowImage} />)}
++        </TouchableOpacity>);
+     };
+     const renderIndicator = () => {
+         if (displayLoadingIndicator) {
+-            return (<ActivityIndicator color={theme?.indicatorColor} testID={testID ? `${HEADER_LOADING_INDICATOR}-${testID}` : HEADER_LOADING_INDICATOR}/>);
++            return (<ActivityIndicator color={theme?.indicatorColor} testID={testID ? `${HEADER_LOADING_INDICATOR}-${testID}` : HEADER_LOADING_INDICATOR} />);
+         }
+     };
+     const renderWeekNumbersSpace = () => {
+-        return showWeekNumbers && <View style={style.current.dayHeader}/>;
++        return showWeekNumbers && <View style={style.current.dayHeader} />;
+     };
+     const renderDayNames = () => {
+         if (!hideDayNames) {
+             return (<View style={style.current.week} testID={testID ? `${HEADER_DAY_NAMES}-${testID}` : HEADER_DAY_NAMES}>
+-          {renderWeekNumbersSpace()}
+-          {renderWeekDays}
+-        </View>);
++                {renderWeekNumbersSpace()}
++                {renderWeekDays}
++            </View>);
+         }
+     };
+     return (<View testID={testID} style={propsStyle} accessible accessibilityRole={'adjustable'} accessibilityActions={accessibilityActions} onAccessibilityAction={onAccessibilityAction} accessibilityElementsHidden={accessibilityElementsHidden} // iOS
+-     importantForAccessibility={importantForAccessibility} // Android
++        importantForAccessibility={importantForAccessibility} // Android
+     >
+-      <View style={style.current.header}>
+-        {_renderArrow('left')}
+-        <View style={style.current.headerContainer}>
+-          {_renderHeader()}
+-          {renderIndicator()}
++        <View style={{
++            flexDirection: "row",
++            alignItems: "center",
++            justifyContent: "flex-start"
++        }}>
++            {_renderArrow('left')}
++            {_renderArrow('right')}
++            <View style={style.current.headerContainer}>
++                {_renderHeader()}
++                {renderIndicator()}
++            </View>
+         </View>
+-        {_renderArrow('right')}
+-      </View>
+-      {renderDayNames()}
++        {renderDayNames()}
+     </View>);
+ });
+ export default CalendarHeader;
+@@ -151,6 +156,6 @@ CalendarHeader.propTypes = {
+     webAriaLevel: PropTypes.number
+ };
+ CalendarHeader.defaultProps = {
+-    monthFormat: 'MMMM yyyy',
++    monthFormat: 'MMM yyyy',
+     webAriaLevel: 1
+ };
+diff --git a/node_modules/react-native-calendars/src/calendar/index.js b/node_modules/react-native-calendars/src/calendar/index.js
+index dc38b65..40723b1 100644
+--- a/node_modules/react-native-calendars/src/calendar/index.js
++++ b/node_modules/react-native-calendars/src/calendar/index.js
+@@ -107,9 +107,18 @@ const Calendar = (props) => {
+     const renderDay = (day, id) => {
+         const dayProps = extractComponentProps(Day, props);
+         if (!sameMonth(day, currentMonth) && hideExtraDays) {
+-            return <View key={id} style={style.current.emptyDayContainer}/>;
++            return null
++            //<View key={id} style={style.current.emptyDayContainer}/>;
+         }
+-        return (<View style={style.current.dayContainer} key={id}>
++        return (<View style={{
++            ...style.current.dayContainer,
++            borderColor : "#E2E3E4",
++            height : 70,
++            width : 50,
++            justifyContent : "flex-start",
++            alignItems : "center",
++            borderWidth : 1
++        }} key={id}>
+         <Day {...dayProps} date={toMarkingFormat(day)} state={getState(day, currentMonth, props)} marking={markedDates?.[toMarkingFormat(day)]} onPress={onPressDay} onLongPress={onLongPressDay}/>
+       </View>);
+     };
+@@ -121,7 +130,11 @@ const Calendar = (props) => {
+         if (props.showWeekNumbers) {
+             week.unshift(renderWeekNumber(days[days.length - 1].getWeek()));
+         }
+-        return (<View style={style.current.week} key={id}>
++        console.log(style.current.week)
++        return (<View style={{
++            ...style.current.week,
++            marginVertical : 0,
++        }} key={id}>
+         {week}
+       </View>);
+     };
+@@ -132,7 +145,10 @@ const Calendar = (props) => {
+         while (days.length) {
+             weeks.push(renderWeek(days.splice(0, 7), weeks.length));
+         }
+-        return <View style={style.current.monthView}>{weeks}</View>;
++        return <View style={{
++            ...style.current.monthView,
++        }}>
++            {weeks}</View>;
+     };
+     const renderHeader = () => {
+         let indicator;
+diff --git a/node_modules/react-native-calendars/src/types.d.ts b/node_modules/react-native-calendars/src/types.d.ts
+index 9038871..efd3123 100644
+--- a/node_modules/react-native-calendars/src/types.d.ts
++++ b/node_modules/react-native-calendars/src/types.d.ts
+@@ -1,5 +1,5 @@
+ import { ViewStyle, TextStyle, StyleProp } from 'react-native';
+-export declare type MarkingTypes = 'dot' | 'multi-dot' | 'period' | 'multi-period' | 'custom';
++export declare type MarkingTypes = 'dot' | 'multi-dot' | 'period' | 'multi-period' | 'custom'|"box";
+ export declare type DayState = 'selected' | 'disabled' | 'inactive' | 'today' | '';
+ export declare type Direction = 'left' | 'right';
+ export declare type DateData = {
