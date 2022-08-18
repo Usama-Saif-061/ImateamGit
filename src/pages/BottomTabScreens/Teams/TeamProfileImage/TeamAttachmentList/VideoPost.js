@@ -2,7 +2,7 @@ import React from "react";
 import { View } from "react-native";
 import Icon from "react-native-vector-icons/AntDesign";
 import Video from "react-native-video";
-import colors from "../../colors";
+import colors from "../../../../../common/colors";
 import { getHeightPercentage, getWidthPercentage } from "../../helper";
 
 const VideoPost = ({ item, size, onPress }) => {
@@ -11,6 +11,7 @@ const VideoPost = ({ item, size, onPress }) => {
             style={{
                 width: size.width,
                 height: size.height,
+                backgroundColor: 'black'
             }}
         >
             {(
@@ -18,7 +19,6 @@ const VideoPost = ({ item, size, onPress }) => {
                     name="play"
                     size={50}
                     color={colors.primary}
-                    onPress={() => { }}
                     style={{
                         position: "absolute",
                         zIndex: 1,
@@ -31,26 +31,28 @@ const VideoPost = ({ item, size, onPress }) => {
                     }}
                 />
             )}
-            <View
-                style={{
-                    width: size.width,
-                    height: size.height,
-                }}
-            >
-                <Video
-                    source={{ uri: item?.upload }}
-                    minLoadRetryCount={3}
-                    controls={false}
-                    paused={true}
-                    fullscreen={true}
-                    resizeMode="cover"
+            {
+                item?.upload &&
+                <View
                     style={{
                         width: size.width,
                         height: size.height,
-                        backgroundColor: "black"
                     }}
-                />
-            </View>
+                >
+                    <Video
+                        source={{ uri: item?.upload }}
+                        minLoadRetryCount={3}
+                        controls={false}
+                        paused={true}
+                        fullscreen={true}
+                        resizeMode="cover"
+                        style={{
+                            width: size.width,
+                            height: size.height,
+                            backgroundColor: "black"
+                        }}
+                    />
+                </View>}
         </View>
     );
 };
