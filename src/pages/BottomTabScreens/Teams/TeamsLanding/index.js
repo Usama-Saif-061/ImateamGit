@@ -303,12 +303,15 @@ const TeamsLanding = ({ navigation, route }) => {
         }}
       /> */}
 
-      <ImageUpload
-        open={IUModal}
-        handleModal={handleIUModal}
-        orgInfo={orgInfo}
-        setReload={setRefresh}
-      />
+      {
+        IUModal &&
+        <ImageUpload
+          open={IUModal}
+          handleModal={handleIUModal}
+          orgInfo={orgInfo}
+          setReload={setRefresh}
+        />
+      }
     </View>
   );
 };

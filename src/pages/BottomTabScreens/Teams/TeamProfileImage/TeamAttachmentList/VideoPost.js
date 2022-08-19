@@ -32,7 +32,7 @@ const VideoPost = ({ item, size, onPress }) => {
                 />
             )}
             {
-                item?.upload &&
+                item?.upload || item?.path &&
                 <View
                     style={{
                         width: size.width,
@@ -40,7 +40,7 @@ const VideoPost = ({ item, size, onPress }) => {
                     }}
                 >
                     <Video
-                        source={{ uri: item?.upload }}
+                        source={{ uri: item?.upload ? item?.upload : item?.path }}
                         minLoadRetryCount={3}
                         controls={false}
                         paused={true}

@@ -6,6 +6,7 @@ import {
   Text,
   Pressable,
   Image,
+  ScrollView,
 } from "react-native";
 import ModalHeader from "../../../../common/Components/ModalHeader";
 import ImagePicker from "react-native-image-crop-picker";
@@ -28,14 +29,16 @@ import TeamAttachmentList from "./TeamAttachmentList";
 import GestureRecognizer from "react-native-swipe-gestures";
 import FullOrgModal from "./FullOrgModal";
 import icons from "../../../../common/icons";
+import { getTeamAttachmentsApi, updateTeamAttachmentsApi } from "./teamsProfileImageApi";
+import TeamLoader from "./TeamLoader";
 
 const ImageUpload = ({ open, handleModal, orgInfo, setReload }) => {
   const { data: member, isFetching } = useGetTeamMembersQuery(orgInfo?.id);
-  console.log('Member ===> ', JSON.stringify(member))
   const [uploadTeamAvatar] = useUploadTeamAvatarMutation();
   const [selectedImage, selectImage] = useState();
   const [adminData, setAdminData] = useState();
   const [loading, setLoading] = useState(false);
+  const [getImagesLoading, setGetImagesLoading] = useState(false)
 
   const fileBottomSheetRef = useRef(null);
   const [imageArray, setImageArray] = useState([]);
@@ -43,6 +46,40 @@ const ImageUpload = ({ open, handleModal, orgInfo, setReload }) => {
 
   const [imageIndex, setImageIndex] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
+
+  useEffect(() => {
+    if (orgInfo) {
+      getTeamAttachments()
+    }
+  }, [orgInfo])
+
+  const getTeamAttachments = async () => {
+    try {
+      setGetImagesLoading(true)
+      const res = await getTeamAttachmentsApi(orgInfo?.id)
+      if (res.resultCode == 200) {
+        console.log('attachments length => ', res.data?.uploads?.length)
+        if (res.data?.uploads?.length > 0) {
+          createAttachmentsArray(res.data.uploads)
+        }
+      }
+      setGetImagesLoading(false)
+    } catch (e) {
+      console.log('Error getting team attachments ', e)
+      setGetImagesLoading(false)
+    }
+  }
+
+  const createAttachmentsArray = (list) => {
+    list.map((img) => {
+      const imgobj = {
+        path: img.upload,
+        fileInfo: { ...img.payload, attachmentId: img?.id },
+      };
+      setImageArray([...imageArray, imgobj]);
+    });
+  }
+
   // const pickImage = () => {
   //   ImagePicker.openPicker({
   //     width: 300,
@@ -80,22 +117,19 @@ const ImageUpload = ({ open, handleModal, orgInfo, setReload }) => {
       payload: {},
       files: imageArray
     }
-    console.log('Image Array ==> ', JSON.stringify(jsonBody))
-    console.log('member Id -> ', member[0].id)
-    let response = await uploadTeamAvatar(orgInfo.id, jsonBody);
-    console.log('response her => ', JSON.stringify(response))
-    if (response) {
-      setLoading(false);
+    // let response = await uploadTeamAvatar(orgInfo.id, jsonBody);
+    let response = await updateTeamAttachmentsApi(orgInfo.id, jsonBody);
+    if (response.resultCode == 200) {
       selectImage();
       setAdminData();
       console.log("Update Avatar: ", response);
       setImageArray([])
       handleModal(false);
     }
+    setLoading(false);
   }
 
   useEffect(() => {
-    console.log('OrgInfo = ', orgInfo ? JSON.stringify(orgInfo) : '')
     member?.filter((x) => {
       if (x.admin) {
         setAdminData(x);
@@ -327,49 +361,51 @@ const ImageUpload = ({ open, handleModal, orgInfo, setReload }) => {
               </TouchableOpacity>
             }
           </View>
-          {
-            imageArray.length > 0 ?
-              <TeamAttachmentList
-                attachmentWidth={imageArray.length > 1 ? 75 : 100}
-                data={imageArray}
-                openingFrom={"mainLanding"}
-                removeItem={(el) => {
-                  setImageArray([...imageArray.filter((item) => item !== el)])
-                }}
-                onAttachmentPressed={(index) => {
-                  setImageIndex(index);
-                  setModalVisible(true);
-                }}
-              /> :
-              <TouchableOpacity
-                // onPress={() => pickImage()}
-                onPress={fileBottomOpen}
-                style={styles.imageContainer}
-              >
-                {selectedImage ? (
-                  <View>
-                    <Image
-                      source={{ uri: selectedImage.path }}
-                      style={styles.image}
-                    />
-                    <TouchableOpacity
-                      style={styles.imageDeleteBtn}
-                      onPress={() => selectImage()}
-                    >
-                      <Icon
-                        name="close"
-                        size={15}
-                        style={{ color: colors.white }}
+          <ScrollView>
+            {
+              imageArray.length > 0 ?
+                <TeamAttachmentList
+                  attachmentWidth={imageArray.length > 1 ? 75 : 100}
+                  data={imageArray}
+                  openingFrom={"mainLanding"}
+                  removeItem={(el) => {
+                    setImageArray([...imageArray.filter((item) => item !== el)])
+                  }}
+                  onAttachmentPressed={(index) => {
+                    setImageIndex(index);
+                    setModalVisible(true);
+                  }}
+                /> :
+                <TouchableOpacity
+                  // onPress={() => pickImage()}
+                  onPress={fileBottomOpen}
+                  style={styles.imageContainer}
+                >
+                  {selectedImage ? (
+                    <View>
+                      <Image
+                        source={{ uri: selectedImage.path }}
+                        style={styles.image}
                       />
-                    </TouchableOpacity>
-                  </View>
-                ) : (
-                  <View>
-                    <Text style={styles.text}>+ Attachments</Text>
-                  </View>
-                )}
-              </TouchableOpacity>
-          }
+                      <TouchableOpacity
+                        style={styles.imageDeleteBtn}
+                        onPress={() => selectImage()}
+                      >
+                        <Icon
+                          name="close"
+                          size={15}
+                          style={{ color: colors.white }}
+                        />
+                      </TouchableOpacity>
+                    </View>
+                  ) : (
+                    <View>
+                      <Text style={styles.text}>+ Attachments</Text>
+                    </View>
+                  )}
+                </TouchableOpacity>
+            }
+          </ScrollView>
         </View>
       </SafeAreaView>
       {/* SHOW MODAL */}
@@ -426,6 +462,7 @@ const ImageUpload = ({ open, handleModal, orgInfo, setReload }) => {
           chooseImage={chooseImage}
         />
       </BottomSheet>
+      {getImagesLoading && <TeamLoader />}
     </Modal>
   );
 };

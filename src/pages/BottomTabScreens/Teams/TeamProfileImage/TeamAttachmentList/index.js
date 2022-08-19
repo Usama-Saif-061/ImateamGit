@@ -55,54 +55,32 @@ const TeamAttachmentList = (props) => {
           backgroundColor: 'black'
         }}
       >
+        <View style={{
+          position: 'absolute',
+          top: 0,
+          right: 0,
+          left: 0,
+          bottom: 0,
+          justifyContent: 'center',
+          alignItems: 'center',
+          zIndex: 999,
+        }}>
+          <Icon
+            name="play"
+            size={50}
+            color={colors.primary}
+            // onPress={() => setUri(Uri.slice(index + 1))}
+            style={{
+            }}
+            onPress={() => {
+              onAttachmentPressed(index);
+            }}
+          />
+        </View>
         {
-          item?.upload ?
-            <Icon
-              name="play"
-              size={50}
-              color={colors.primary}
-              onPress={() => { }}
-              // onPress={() => setUri(Uri.slice(index + 1))}
-              style={{
-                position: "absolute",
-                right:
-                  attachmentWidth === 75
-                    ? getWidthPercentage(33)
-                    : getWidthPercentage(45),
-                bottom: getHeightPercentage(20),
-                zIndex: 999,
-              }}
-              onPress={() => {
-                onAttachmentPressed(index);
-              }}
-            /> :
-            <View style={{
-              position: 'absolute',
-              top: 0,
-              right: 0,
-              left: 0,
-              bottom: 0,
-              justifyContent: 'center',
-              alignItems: 'center'
-            }}>
-              <Icon
-                name="play"
-                size={50}
-                color={colors.primary}
-                // onPress={() => setUri(Uri.slice(index + 1))}
-                style={{
-                  zIndex: 999,
-                }}
-                onPress={() => {
-                  onAttachmentPressed(index);
-                }}
-              />
-            </View>
-        }
-        {
-          item?.upload &&
+          item?.upload || item?.path &&
           <Video
-            source={{ uri: item?.upload }}
+            source={{ uri: item?.upload ? item?.upload : item?.path }}
             minLoadRetryCount={3}
             controls={openingFrom === "FullPost" ? true : false}
             // paused={openingFrom === "FullPost" ? false : true}
@@ -174,12 +152,13 @@ const TeamAttachmentList = (props) => {
   };
 
   const renderDocument = (item) => {
+    console.log('item => ', item)
     return (
       <View
         style={{
           flex: 1,
           width: Dimensions.get("screen").width,
-          borderWidth: 1,
+          borderWidth: item?.path ? 1 : 0,
           borderColor: colors.white,
         }}
       >
@@ -191,12 +170,12 @@ const TeamAttachmentList = (props) => {
         startInLoadingState={true} 
         /> : */}
         {
-          item?.url ?
+          item?.path ?
             <Pdf
               page={page}
               singlePage={false}
               enablePaging={true}
-              source={{ uri: `${item?.url}`, cache: true }}
+              source={{ uri: `${item?.path}`, cache: true }}
               trustAllCerts={false}
               style={{
                 flex: 1,
