@@ -194,7 +194,7 @@ const SignUpStep2 = ({ navigation }) => {
         <KeyboardAvoidingView
           style={{ flex: 1 }}
           behavior={"position"}
-          // keyboardVerticalOffset={keyboardVerticalOffset}
+        // keyboardVerticalOffset={keyboardVerticalOffset}
         >
           <SafeAreaView>
             <Pressable
@@ -329,7 +329,7 @@ const SignUpStep2 = ({ navigation }) => {
                 resetValue={false}
                 //reset textInput Value with true and false state
                 underlineColorAndroid="transparent"
-                //To remove the underline from the android input
+              //To remove the underline from the android input
               />
             </View>
             <View>

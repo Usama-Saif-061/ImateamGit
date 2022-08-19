@@ -30,7 +30,7 @@ const AccountPin = ({ navigation }) => {
         console.log("Account Pin", response);
         navigation.goBack();
       }
-    } 
+    }
     else {
       setPin(true);
     }
@@ -60,15 +60,16 @@ const AccountPin = ({ navigation }) => {
             autoFocusOnLoad={false}
             codeInputFieldStyle={styles.underlineStyleBase}
             codeInputHighlightStyle={styles.underlineStyleHighLighted}
+            secureTextEntry={true}
             onCodeFilled={(code) => {
               // unstable_batchedUpdates(() => {
-                setPinCode(code);
+              setPinCode(code);
               // });
             }}
           />
           {pinCodeFilled ? <Text style={styles.errMsg}>Enter full code.</Text> : null}
         </View>
-        
+
       </SafeAreaView>
     </View>
   );

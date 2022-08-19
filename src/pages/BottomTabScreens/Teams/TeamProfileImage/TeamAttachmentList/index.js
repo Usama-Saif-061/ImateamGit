@@ -318,6 +318,7 @@ const TeamAttachmentList = (props) => {
         horizontal={true}
         keyExtractor={keyExtractor}
         renderItem={renderAttachments}
+        onScrollToIndexFailed={e => console.log('scroll failed', e)}
         onMomentumScrollEnd={(e) => {
           let pageNumber = Math.min(Math.max(Math.floor(e.nativeEvent.contentOffset.x / Dimensions.get("screen").width + 0.5) + 1, 0), data.length);
           console.log(pageNumber);

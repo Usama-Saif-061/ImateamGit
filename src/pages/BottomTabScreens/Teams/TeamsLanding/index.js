@@ -9,6 +9,14 @@ import {
   Alert,
   ScrollView,
 } from "react-native";
+import Animated, {
+  useAnimatedGestureHandler,
+  useAnimatedStyle,
+  useSharedValue,
+  withSpring,
+} from "react-native-reanimated";
+import { PanGestureHandler } from "react-native-gesture-handler";
+import Icon from "react-native-vector-icons/Feather";
 import CommonIcon from "react-native-vector-icons/AntDesign";
 import CalendarIcon from "react-native-vector-icons/MaterialCommunityIcons";
 import MessageIcon from "react-native-vector-icons/SimpleLineIcons";
@@ -26,7 +34,10 @@ import { ShowInitialsOfName } from "../../../../common/Components/ShowInitialsOf
 import ImageUpload from "../TeamProfileImage";
 import { ActivityIndicator } from "react-native-paper";
 import deleteOrg from "../API/deleteOrgApi";
-import { useGetUserQuery, useGetFansQuery } from "../../../../Reducers/usersApi";
+import {
+  useGetUserQuery,
+  useGetFansQuery,
+} from "../../../../Reducers/usersApi";
 import { useDeleteTeamMutation } from "../../../../Reducers/teamsApi";
 import { setNavFromLanding } from "../../../../Reducers/CommonReducers/calendarSlice";
 
@@ -34,13 +45,13 @@ const iconColor = colors.iconColor;
 const iconSize = 18;
 
 const TeamsLanding = ({ navigation, route }) => {
-  let { data: userInfo } = useGetUserQuery()
+  let { data: userInfo } = useGetUserQuery();
   let { data: teams, isFetching, refetch } = useGetTeamsQuery();
-  let { refetch: refetchFansData } = useGetFansQuery()
+  let { refetch: refetchFansData } = useGetFansQuery();
   let type = route?.params?.type;
-  const [deleteTeam] = useDeleteTeamMutation()
+  const [deleteTeam] = useDeleteTeamMutation();
 
-  const dispatch = useDispatch()
+  const dispatch = useDispatch();
 
   const [newData, setNewData] = useState([]);
   const [IUModal, handleIUModal] = useState(false);
@@ -92,20 +103,22 @@ const TeamsLanding = ({ navigation, route }) => {
                 // onPress={() => navigation.navigate("Conversation", {
                 //   teamObj: item
                 // })}
-                onPress={() => navigation.navigate('StartConversation', {
-                  teamObj: item
-                })}
+                onPress={() =>
+                  navigation.navigate("StartConversation", {
+                    teamObj: item,
+                  })
+                }
               />
               <CalendarIcon
                 name="calendar-blank-outline"
                 size={iconSize}
                 color={iconColor}
                 onPress={() => {
-                  navigation.navigate('CalendarHome', {
+                  navigation.navigate("CalendarHome", {
                     calId: item.organization_calendar_id,
-                    isTeam: true
+                    isTeam: true,
                   });
-                  dispatch(setNavFromLanding(true))
+                  dispatch(setNavFromLanding(true));
                 }}
               />
               <TeamIcon
@@ -177,7 +190,6 @@ const TeamsLanding = ({ navigation, route }) => {
       organizationId: id,
     };
     await deleteTeam(body);
-
   };
 
   useEffect(() => {
@@ -199,6 +211,32 @@ const TeamsLanding = ({ navigation, route }) => {
     }
   }, [isFetching, newData, orgAction]);
 
+  const pressed = useSharedValue(false);
+  const startingPositionX = getWidthPixel(300);
+  const startingPositionY = getHeightPixel(550);
+  const x = useSharedValue(startingPositionX);
+  const y = useSharedValue(startingPositionY);
+  const eventHandler = useAnimatedGestureHandler({
+    onStart: (event, ctx) => {
+      pressed.value = true;
+      ctx.startX = x.value;
+      ctx.startY = y.value;
+    },
+    onActive: (event, ctx) => {
+      x.value = ctx.startX + event.translationX;
+      y.value = ctx.startY + event.translationY;
+    },
+    onEnd: (event, ctx) => {
+      pressed.value = false;
+      // x.value = withSpring(startingPosition);
+      // y.value = withSpring(startingPosition);
+    },
+  });
+  const uas = useAnimatedStyle(() => {
+    return {
+      transform: [{ translateX: x.value }, { translateY: y.value }],
+    };
+  });
   return (
     <View style={styles.container}>
       {/* <Text>I am here</Text> */}
@@ -208,13 +246,47 @@ const TeamsLanding = ({ navigation, route }) => {
       </SafeAreaView>
       {/* CONTENT 1 FOR EACH CARD */}
       <View style={styles.content}>
+        <PanGestureHandler onGestureEvent={eventHandler}>
+          <Animated.View
+            style={[
+              {
+                backgroundColor: colors.inputBlue,
+                borderRadius: 30,
+                height: 60,
+                width: 60,
+                position: "absolute",
+                justifyContent: "center",
+                alignItems: "center",
+                zIndex: 10,
+              },
+              uas,
+            ]}
+          >
+            <TouchableOpacity
+              onPress={() => {
+                navigation.navigate("NewOrg", {
+                  actionType: setOrgAction,
+                });
+              }}
+            >
+              <Icon
+                name="plus"
+                size={getWidthPixel(26)}
+                style={{ padding: 16, color: "#fff" }}
+              />
+            </TouchableOpacity>
+            {/* <AddButton onPress={() => setFansModal(true)} /> */}
+          </Animated.View>
+        </PanGestureHandler>
         {isFetching ? (
           <ActivityIndicator
             color={colors.inputBlue}
             style={{ margin: 15, flex: 1 }}
           />
         ) : newData ? (
-          <FlatList data={newData} renderItem={renderTeam} />
+          <FlatList
+            style={{ marginBottom: getHeightPixel(10) }}
+            data={newData} renderItem={renderTeam} />
         ) : (
           <View
             style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
@@ -225,13 +297,13 @@ const TeamsLanding = ({ navigation, route }) => {
           </View>
         )}
       </View>
-      <AddButton
+      {/* <AddButton
         onPress={() => {
           navigation.navigate("NewOrg", {
             actionType: setOrgAction,
           });
         }}
-      />
+      /> */}
 
       {
         IUModal &&

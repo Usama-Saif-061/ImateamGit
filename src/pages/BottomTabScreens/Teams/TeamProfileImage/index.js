@@ -14,7 +14,10 @@ import Icon from "react-native-vector-icons/AntDesign";
 import styles from "./style";
 import colors from "../../../../common/colors";
 import { useGetUserQuery } from "../../../../Reducers/usersApi";
-import { useGetTeamMembersQuery, useGetTeamsQuery } from "../../../../Reducers/teamsApi";
+import {
+  useGetTeamMembersQuery,
+  useGetTeamsQuery,
+} from "../../../../Reducers/teamsApi";
 import updateTeamAvatar from "../API/updateTeamAvatarApi";
 import { ActivityIndicator } from "react-native-paper";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -24,12 +27,19 @@ import RNFS from "react-native-fs";
 import ImgToBase64 from "react-native-image-base64";
 import BottomSheet from "@gorhom/bottom-sheet";
 import BottomSheetModal from "../../Messages/Components/BottomSheetModal";
-import { getHeightPixel, getToken, getWidthPixel } from "../../../../common/helper";
+import {
+  getHeightPixel,
+  getToken,
+  getWidthPixel,
+} from "../../../../common/helper";
 import TeamAttachmentList from "./TeamAttachmentList";
 import GestureRecognizer from "react-native-swipe-gestures";
 import FullOrgModal from "./FullOrgModal";
 import icons from "../../../../common/icons";
-import { getTeamAttachmentsApi, updateTeamAttachmentsApi } from "./teamsProfileImageApi";
+import {
+  getTeamAttachmentsApi,
+  updateTeamAttachmentsApi,
+} from "./teamsProfileImageApi";
 import TeamLoader from "./TeamLoader";
 
 const ImageUpload = ({ open, handleModal, orgInfo, setReload }) => {
@@ -38,48 +48,49 @@ const ImageUpload = ({ open, handleModal, orgInfo, setReload }) => {
   const [selectedImage, selectImage] = useState();
   const [adminData, setAdminData] = useState();
   const [loading, setLoading] = useState(false);
-  const [getImagesLoading, setGetImagesLoading] = useState(false)
+  const [getImagesLoading, setGetImagesLoading] = useState(false);
 
   const fileBottomSheetRef = useRef(null);
   const [imageArray, setImageArray] = useState([]);
-  const [flag, setFlag] = useState(false)
+  const [flag, setFlag] = useState(false);
 
   const [imageIndex, setImageIndex] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
 
   useEffect(() => {
     if (orgInfo) {
-      getTeamAttachments()
+      getTeamAttachments();
     }
-  }, [orgInfo])
+  }, [orgInfo]);
 
   const getTeamAttachments = async () => {
     try {
-      setGetImagesLoading(true)
-      const res = await getTeamAttachmentsApi(orgInfo?.id)
+      setGetImagesLoading(true);
+      const res = await getTeamAttachmentsApi(orgInfo?.id);
       if (res.resultCode == 200) {
-        console.log('attachments length => ', res.data?.uploads?.length)
+        console.log("attachments length => ", res.data?.uploads?.length);
         if (res.data?.uploads?.length > 0) {
-          createAttachmentsArray(res.data.uploads)
+          createAttachmentsArray(res.data.uploads);
         }
       }
-      setGetImagesLoading(false)
+      setGetImagesLoading(false);
     } catch (e) {
-      console.log('Error getting team attachments ', e)
-      setGetImagesLoading(false)
+      console.log("Error getting team attachments ", e);
+      setGetImagesLoading(false);
     }
-  }
+  };
 
   const createAttachmentsArray = (list) => {
+    let arr = [];
     list.map((img) => {
       const imgobj = {
         path: img.upload,
         fileInfo: { ...img.payload, attachmentId: img?.id },
       };
-      setImageArray([...imageArray, imgobj]);
+      arr.push(imgobj);
     });
-  }
-
+    setImageArray(arr);
+  };
   // const pickImage = () => {
   //   ImagePicker.openPicker({
   //     width: 300,
@@ -110,23 +121,25 @@ const ImageUpload = ({ open, handleModal, orgInfo, setReload }) => {
   //   payload: orgInfo?.payload,
   // };
   async function updateAvatar() {
-    setLoading(true);
+    // setLoading(true);
+    setGetImagesLoading(true);
     let jsonBody = {
       // memberId: orgInfo?.id,
       memberId: member[0]?.id,
       payload: {},
-      files: imageArray
-    }
+      files: imageArray,
+    };
     // let response = await uploadTeamAvatar(orgInfo.id, jsonBody);
     let response = await updateTeamAttachmentsApi(orgInfo.id, jsonBody);
     if (response.resultCode == 200) {
       selectImage();
       setAdminData();
       console.log("Update Avatar: ", response);
-      setImageArray([])
+      setImageArray([]);
       handleModal(false);
     }
-    setLoading(false);
+    setGetImagesLoading(false);
+    // setLoading(false);
   }
 
   useEffect(() => {
@@ -138,7 +151,7 @@ const ImageUpload = ({ open, handleModal, orgInfo, setReload }) => {
   }, [isFetching, adminData]);
 
   // Attaching attachments logic is here
-  // Media Pickers here -> 
+  // Media Pickers here ->
   const fileBottomClose = () => {
     console.log("closed");
     fileBottomSheetRef.current.close();
@@ -151,9 +164,9 @@ const ImageUpload = ({ open, handleModal, orgInfo, setReload }) => {
   // Convert Image to Base64
   const convertImageToBase64 = async (img) => {
     console.log("img: ", img);
-    if (img.fileInfo.fileType.substring(0, 2) == 'vi') {
-      console.log('this is video')
-      RNFS.readFile(img.path, "base64").then((RNFSresponse) => {
+    if (img.fileInfo.fileType.substring(0, 2) == "vi") {
+      console.log("this is video");
+      await RNFS.readFile(img.path, "base64").then((RNFSresponse) => {
         // console.log("RNFSresponse: ", RNFSresponse);
         const obj = {
           data: RNFSresponse,
@@ -169,7 +182,7 @@ const ImageUpload = ({ open, handleModal, orgInfo, setReload }) => {
       });
     } else {
       if (img.path) {
-        ImgToBase64.getBase64String(img.path)
+        await ImgToBase64.getBase64String(img.path)
           .then((base64String) => {
             //   console.log("base64String: ", base64String);
             const temp = base64String;
@@ -181,7 +194,7 @@ const ImageUpload = ({ open, handleModal, orgInfo, setReload }) => {
             let temArray = imageArray;
             temArray.push(imgobj);
             console.log("temArray.length ->", temArray.length);
-            console.log('imageArray.length -> ', imageArray.length)
+            console.log("imageArray.length -> ", imageArray.length);
             setImageArray(temArray);
             // getPickerData(imageArray);
             // setImageArray([]);
@@ -192,7 +205,7 @@ const ImageUpload = ({ open, handleModal, orgInfo, setReload }) => {
           .catch((err) => "not converted");
       }
     }
-    setTimeout(() => setFlag(!flag), 500)
+    setTimeout(() => setFlag(!flag), 500);
   };
 
   // Gallery Image
@@ -215,7 +228,7 @@ const ImageUpload = ({ open, handleModal, orgInfo, setReload }) => {
     }).then((image) => {
       //setUri(image.path);
       console.log("ma image wala hn", image);
-      image.map((item) => {
+      image.map(async (item) => {
         let imageName = item.filename;
         if (Platform.OS === "android") {
           imageName = new Date();
@@ -231,13 +244,14 @@ const ImageUpload = ({ open, handleModal, orgInfo, setReload }) => {
             fileType: item.mime,
           },
         };
-        console.log('item -> ', item)
-        convertImageToBase64(imgobj);
+        console.log("item -> ", item);
+        await convertImageToBase64(imgobj);
       });
     });
     // console.log("i am image converted in base 64", Uri);
-    setTimeout(() => setFlag(!flag), 500)
+    setTimeout(() => setFlag(!flag), 500);
   };
+  console.log('imageArray.length => ', imageArray.length)
 
   // Document
   const chooseDocument = async () => {
@@ -270,7 +284,7 @@ const ImageUpload = ({ open, handleModal, orgInfo, setReload }) => {
     } catch (error) {
       console.log("error in picking file", error);
     }
-    setTimeout(() => setFlag(!flag), 500)
+    setTimeout(() => setFlag(!flag), 500);
   };
 
   // Camera
@@ -304,19 +318,19 @@ const ImageUpload = ({ open, handleModal, orgInfo, setReload }) => {
       convertImageToBase64(imgobj);
       //   );
     });
-    setTimeout(() => setFlag(!flag), 500)
+    setTimeout(() => setFlag(!flag), 500);
     // console.log("i am image converted in base 64", Uri.length);
   };
   return (
     <Modal animationType="slide" visible={open}>
-      <SafeAreaView>
+      <SafeAreaView style={{ flex: 1 }}>
         {/* modal header */}
         <ModalHeader
           // heading={"Upload Image"}
           heading={"Upload Attachments"}
           closeModal={() => {
-            setImageArray([])
-            handleModal(false)
+            setImageArray([]);
+            handleModal(false);
           }}
           btnTitle={"Submit"}
           btnMethod={updateAvatar}
@@ -331,94 +345,98 @@ const ImageUpload = ({ open, handleModal, orgInfo, setReload }) => {
             {adminData?.user_info?.display_name}
           </Text>
         </View>
-
-        <View>
-          <View style={{
-            flexDirection: 'row',
-            alignItems: 'center',
-            justifyContent: 'space-between',
+        <View
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "space-between",
             paddingVertical: getHeightPixel(10),
             paddingHorizontal: getWidthPixel(15),
-          }}>
-            <Text style={styles.upload}>Upload</Text>
-            {
-              imageArray.length > 0 &&
-              <TouchableOpacity onPress={fileBottomOpen}>
-                <View style={{
+          }}
+        >
+          <Text style={styles.upload}>Upload</Text>
+          {imageArray.length > 0 && (
+            <TouchableOpacity onPress={fileBottomOpen}>
+              <View
+                style={{
                   backgroundColor: colors.primary,
-                  justifyContent: 'center',
-                  alignItems: 'center',
+                  justifyContent: "center",
+                  alignItems: "center",
                   padding: 10,
-                  borderRadius: 10
-                }}>
-                  <Image source={icons.iconsMini.Add}
-                    resizeMode='contain'
-                    style={{
-                      tintColor: 'white'
-                    }}
-                  />
-                </View>
-              </TouchableOpacity>
-            }
-          </View>
-          <ScrollView>
-            {
-              imageArray.length > 0 ?
-                <TeamAttachmentList
-                  attachmentWidth={imageArray.length > 1 ? 75 : 100}
-                  data={imageArray}
-                  openingFrom={"mainLanding"}
-                  removeItem={(el) => {
-                    setImageArray([...imageArray.filter((item) => item !== el)])
+                  borderRadius: 10,
+                }}
+              >
+                <Image
+                  source={icons.iconsMini.Add}
+                  resizeMode="contain"
+                  style={{
+                    tintColor: "white",
                   }}
-                  onAttachmentPressed={(index) => {
-                    setImageIndex(index);
-                    setModalVisible(true);
-                  }}
-                /> :
-                <TouchableOpacity
-                  // onPress={() => pickImage()}
-                  onPress={fileBottomOpen}
-                  style={styles.imageContainer}
-                >
-                  {selectedImage ? (
-                    <View>
-                      <Image
-                        source={{ uri: selectedImage.path }}
-                        style={styles.image}
-                      />
-                      <TouchableOpacity
-                        style={styles.imageDeleteBtn}
-                        onPress={() => selectImage()}
-                      >
-                        <Icon
-                          name="close"
-                          size={15}
-                          style={{ color: colors.white }}
-                        />
-                      </TouchableOpacity>
-                    </View>
-                  ) : (
-                    <View>
-                      <Text style={styles.text}>+ Attachments</Text>
-                    </View>
-                  )}
-                </TouchableOpacity>
-            }
-          </ScrollView>
+                />
+              </View>
+            </TouchableOpacity>
+          )}
         </View>
+        <ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false}>
+          <View>
+            {imageArray.length > 0 ? (
+              <TeamAttachmentList
+                attachmentWidth={imageArray.length > 1 ? 75 : 100}
+                data={imageArray}
+                openingFrom={"mainLanding"}
+                removeItem={(el) => {
+                  setImageArray([...imageArray.filter((item) => item !== el)]);
+                }}
+                onAttachmentPressed={(index) => {
+                  setImageIndex(index);
+                  setModalVisible(true);
+                }}
+              />
+            ) : (
+              <TouchableOpacity
+                // onPress={() => pickImage()}
+                onPress={fileBottomOpen}
+                style={styles.imageContainer}
+              >
+                {selectedImage ? (
+                  <View>
+                    <Image
+                      source={{ uri: selectedImage.path }}
+                      style={styles.image}
+                    />
+                    <TouchableOpacity
+                      style={styles.imageDeleteBtn}
+                      onPress={() => selectImage()}
+                    >
+                      <Icon
+                        name="close"
+                        size={15}
+                        style={{ color: colors.white }}
+                      />
+                    </TouchableOpacity>
+                  </View>
+                ) : (
+                  <View>
+                    <Text style={styles.text}>+ Attachments</Text>
+                  </View>
+                )}
+              </TouchableOpacity>
+            )}
+          </View>
+        </ScrollView>
       </SafeAreaView>
       {/* SHOW MODAL */}
-      {
-        modalVisible &&
+      {modalVisible && (
         <GestureRecognizer
           style={{ flex: 1 }}
           onSwipeDown={() => console.log("modal is close")}
         >
-          <View style={{
-            flex: 1,
-            backgroundColor: "black"
-          }}>
+          <View
+            style={{
+              flex: 1,
+              backgroundColor: "black",
+            }}
+          >
             <Modal
               statusBarTranslucent={false}
               animationType="fade"
@@ -447,7 +465,8 @@ const ImageUpload = ({ open, handleModal, orgInfo, setReload }) => {
               />
             </Modal>
           </View>
-        </GestureRecognizer>}
+        </GestureRecognizer>
+      )}
       <BottomSheet
         index={-1}
         snapPoints={[200, 190]}

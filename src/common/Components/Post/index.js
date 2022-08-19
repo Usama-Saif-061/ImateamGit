@@ -407,6 +407,7 @@ const Post = memo(
             showAttachmentPicker={showAttachmentPicker}
             attachmentShown={attachmentShown}
             pickerData={pickerData}
+            clearPickerData={clearPickerData}
             setLoading={setLoading}
             commentType={commentType}
           />

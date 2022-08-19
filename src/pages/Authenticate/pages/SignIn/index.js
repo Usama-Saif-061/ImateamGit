@@ -40,26 +40,37 @@ const SignIn = ({ navigation }) => {
   });
 
   const checkAllFields = async () => {
-    if (user.email && user.password) {
-      setLoading(true);
-      const res = await LoginAPI(user.email, user.password);
-      console.log("login resp", res);
-      if (res?.token) {
-        moveToNextScreen(navigation, "MainLanding");
-        setLoading(false);
-      } else if (res?.data?.detail) {
-        //alert("Ooops! \n ", res.data.detail);
-        // Alert.alert(JSON.stringify(res.data.detail));
-        showToast2();
-        console.log("i am here", res.data.detail);
-        setLoading(false);
+    console.log("error====>", errors);
+    if (errors.email !== "" || errors.password !== "") {
+      if (errors.email !== "" && errors.password == "") {
+        showToast3(errors.email);
+      } else if (errors.password !== "" && errors.email == "") {
+        showToast3(errors.password);
       } else {
-        console.log(res.data.detail);
-        setLoading(false);
+        showToast3();
       }
     } else {
-      setLoading(false);
-      showToast();
+      if (user.email && user.password) {
+        setLoading(true);
+        const res = await LoginAPI(user.email, user.password);
+        console.log("login resp", res);
+        if (res?.token) {
+          moveToNextScreen(navigation, "MainLanding");
+          setLoading(false);
+        } else if (res?.data?.detail) {
+          //alert("Ooops! \n ", res.data.detail);
+          // Alert.alert(JSON.stringify(res.data.detail));
+          showToast2();
+          console.log("i am here", res.data.detail);
+          setLoading(false);
+        } else {
+          console.log(res.data.detail);
+          setLoading(false);
+        }
+      } else {
+        setLoading(false);
+        showToast();
+      }
     }
   };
 
@@ -95,6 +106,14 @@ const SignIn = ({ navigation }) => {
       type: "error",
       text1: `Ooops`,
       text2: `Input Fields are Empty`,
+      visibilityTime: 3000,
+    });
+  };
+  const showToast3 = (txt) => {
+    Toast.show({
+      type: "error",
+      text1: `Ooops`,
+      text2: txt ? txt : `Please enter valid Email & password`,
       visibilityTime: 3000,
     });
   };

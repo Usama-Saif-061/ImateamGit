@@ -20,13 +20,17 @@ import { createMaterialTopTabNavigator } from "@react-navigation/material-top-ta
 import colors from "../../../common/colors";
 import {
   font,
+  getHeightPixel,
   getWidthPercentage,
   getWidthPixel,
 } from "../../../common/helper";
 import BottomNavigation from "../../../common/Components/BottomNavigation";
 import icons from "../../../common/icons";
 import CheckIcon from "react-native-vector-icons/Ionicons";
-import { TouchableOpacity } from "react-native-gesture-handler";
+import {
+  PanGestureHandler,
+  TouchableOpacity,
+} from "react-native-gesture-handler";
 import AddFansModal from "./AddFans";
 import { ShowInitialsOfName } from "../../../common/Components/ShowInitialsOfName";
 import FollowFan from "../API/followFanApi";
@@ -34,8 +38,18 @@ import UnFollowFan from "../API/unFollowFanApi";
 import BlockFan from "../API/blockFanApi";
 import { ActivityIndicator } from "react-native-paper";
 import { useGetFansQuery, useGetUserQuery } from "../../../Reducers/usersApi";
-import { useFollowFanMutation, useUnFollowFanMutation } from "../../../Reducers/usersApi";
-import { addFansApi } from './fansApi'
+import {
+  useFollowFanMutation,
+  useUnFollowFanMutation,
+} from "../../../Reducers/usersApi";
+import { addFansApi } from "./fansApi";
+import Animated, {
+  useAnimatedGestureHandler,
+  useAnimatedStyle,
+  useSharedValue,
+  withSpring,
+} from "react-native-reanimated";
+import Icon from "react-native-vector-icons/Feather";
 
 const Tab = createMaterialTopTabNavigator();
 const sampleProfile =
@@ -48,20 +62,20 @@ const Fans = ({ navigation }) => {
     error,
     refetch,
   } = useGetFansQuery(userInfo?.id);
-  const [addAFollow] = useFollowFanMutation()
-  const [unfollowAFan] = useUnFollowFanMutation()
+  const [addAFollow] = useFollowFanMutation();
+  const [unfollowAFan] = useUnFollowFanMutation();
   const [statusList, setBlockList] = useState([]);
   const [searchFilter, setsearchFilter] = useState([]);
   const [isSelected, setisSelected] = useState("All");
   const [mainList, setMainList] = useState([]);
   const [openFansModal, setFansModal] = useState(false);
   const [searchInput, setSearchInput] = useState(false);
-  const [updatedFans, setUpdatedFans] = useState([])
+  const [updatedFans, setUpdatedFans] = useState([]);
   useEffect(() => {
     if (fansData?.length > 0) {
-      setUpdatedFans(fansData)
+      setUpdatedFans(fansData);
     }
-  }, [fansData])
+  }, [fansData]);
   const dispatch = useDispatch();
   console.log("mainList", mainList);
   const apiCall = async (id, action) => {
@@ -90,7 +104,6 @@ const Fans = ({ navigation }) => {
         action: "remove",
         connectionId: id,
         userOrTarget: "user",
-
       };
       let response = await UnFollowFan(body, userInfo?.id);
       if (response) {
@@ -211,7 +224,7 @@ const Fans = ({ navigation }) => {
           <Text style={styles.selectionText}>Block</Text>
         </TouchableOpacity>
       ) : null}
-      { }
+      {}
     </View>
   );
 
@@ -285,6 +298,32 @@ const Fans = ({ navigation }) => {
     }
     console.log(searchFilter);
   }, [isSelected, statusList, searchFilter, isFetching, fansData, updatedFans]);
+  const pressed = useSharedValue(false);
+  const startingPositionX = getWidthPixel(300);
+  const startingPositionY = getHeightPixel(450);
+  const x = useSharedValue(startingPositionX);
+  const y = useSharedValue(startingPositionY);
+  const eventHandler = useAnimatedGestureHandler({
+    onStart: (event, ctx) => {
+      pressed.value = true;
+      ctx.startX = x.value;
+      ctx.startY = y.value;
+    },
+    onActive: (event, ctx) => {
+      x.value = ctx.startX + event.translationX;
+      y.value = ctx.startY + event.translationY;
+    },
+    onEnd: (event, ctx) => {
+      pressed.value = false;
+      // x.value = withSpring(startingPosition);
+      // y.value = withSpring(startingPosition);
+    },
+  });
+  const uas = useAnimatedStyle(() => {
+    return {
+      transform: [{ translateX: x.value }, { translateY: y.value }],
+    };
+  });
 
   return (
     <View style={styles.container}>
@@ -302,11 +341,12 @@ const Fans = ({ navigation }) => {
               width={100}
               onBlur={() => setsearchFilter([])}
               onChangeText={(value) => {
-                setsearchFilter(mainList?.filter((item) =>
-                  item.display_info.display_name
-                    .toLowerCase()
-                    .includes(value.toLowerCase())
-                )
+                setsearchFilter(
+                  mainList?.filter((item) =>
+                    item.display_info.display_name
+                      .toLowerCase()
+                      .includes(value.toLowerCase())
+                  )
                 );
               }}
             />
@@ -350,22 +390,45 @@ const Fans = ({ navigation }) => {
       </View>
       {/* FLAT LIST FOR RENDERING THE LIST OF EACH USER */}
       <View style={{ flex: 1 }}>
+        <PanGestureHandler onGestureEvent={eventHandler}>
+          <Animated.View
+            style={[
+              {
+                backgroundColor: colors.inputBlue,
+                borderRadius: 30,
+                height: 60,
+                width: 60,
+                position: "absolute",
+                justifyContent: "center",
+                alignItems: "center",
+                zIndex: 10,
+              },
+              uas,
+            ]}
+          >
+            <TouchableOpacity onPress={() => setFansModal(true)}>
+              <Icon
+                name="plus"
+                size={getWidthPixel(26)}
+                style={{ padding: 16, color: "#fff" }}
+              />
+            </TouchableOpacity>
+            {/* <AddButton onPress={() => setFansModal(true)} /> */}
+          </Animated.View>
+        </PanGestureHandler>
         {isFetching ? (
           <ActivityIndicator color={colors.inputBlue} style={{ flex: 1 }} />
         ) : (
           <View style={styles.content2}>
             <FlatList
+              style={{ zIndex: 5 }}
               data={searchFilter.length != 0 ? searchFilter : mainList}
               renderItem={renderList}
               refreshing={true}
             />
           </View>
         )}
-        <AddButton onPress={() => setFansModal(true)} />
       </View>
-      {/* <View>
-        <BottomNavigation navigation={navigation} />
-      </View> */}
       <AddFansModal
         openModal={openFansModal}
         modal={setFansModal}
@@ -426,11 +489,7 @@ const styles = StyleSheet.create({
   text: {
     ...font(14, "bold"),
   },
-  content2: {
-    flex: 2,
-    paddingHorizontal: 17,
-    paddingVertical: 8,
-  },
+  content2: { paddingHorizontal: 17, paddingVertical: 8 },
   listWrapper: {
     flexDirection: "row",
     alignItems: "center",

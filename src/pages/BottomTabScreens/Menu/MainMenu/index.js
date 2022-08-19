@@ -28,7 +28,7 @@ import CopyRightModal from "../../../../common/Components/CopyRightModal";
 const Menu = ({ navigation }) => {
   const [TOSVisible, setTOSModalVisible] = useState(false);
   const [privacyPolicyVisible, setPrivacyPolicyModalVisible] = useState(false);
-  const [showCopyrightModal, setShowCopyrightModal] = useState(false)
+  const [showCopyrightModal, setShowCopyrightModal] = useState(false);
   const { data: userInfo, isFetching: fetch } = useGetUserQuery();
   const dispatch = useDispatch();
   const sampleProfile =
@@ -86,9 +86,9 @@ const Menu = ({ navigation }) => {
             if (!userInfo?.is_seller) {
               navigation.navigate("SellerSignUp", {
                 navigation,
-              })
+              });
             } else {
-              navigation.navigate("StoreScreen")
+              navigation.navigate("StoreScreen");
             }
           }}
         >
@@ -149,7 +149,7 @@ const Menu = ({ navigation }) => {
             />
           </View>
         </Pressable>
-        <Pressable>
+        <Pressable onPress={() => navigation.navigate("About")}>
           <View style={styles.infoItem}>
             <Text style={styles.pageLinkText}>About</Text>
             <Icon
@@ -160,7 +160,7 @@ const Menu = ({ navigation }) => {
             />
           </View>
         </Pressable>
-        <Pressable>
+        {/* <Pressable>
           <View style={styles.infoItem}>
             <Text style={styles.pageLinkText}>FAQ</Text>
             <Icon
@@ -170,7 +170,7 @@ const Menu = ({ navigation }) => {
               style={styles.icon}
             />
           </View>
-        </Pressable>
+        </Pressable> */}
         <TouchableOpacity
           onPress={async () => {
             try {

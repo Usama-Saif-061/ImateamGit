@@ -1,12 +1,17 @@
-import React from 'react'
-import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native'
-import colors from '../../../../../common/colors'
-import icons from '../../../../../common/icons'
-import { getHeightPixel, getWidthPixel, showInitials } from '../../../../../common/helper'
-import { MessageList } from '../../constants'
-import images from '../../../../../common/images'
+import React from "react";
+import { View, Text, StyleSheet, Image, TouchableOpacity } from "react-native";
+import colors from "../../../../../common/colors";
+import icons from "../../../../../common/icons";
+import {
+  getHeightPixel,
+  getWidthPixel,
+  showInitials,
+} from "../../../../../common/helper";
+import { useDispatch } from "react-redux";
+import { updateChatList } from "../../../../../Reducers/CommonReducers/chatSlice";
 
 const GroupHeader = (props) => {
+  const dispatch = useDispatch();
   // let list = MessageList.length > 4 ? MessageList.slice(0, 4) : MessageList
   let list =
     props.chatObj?.users?.length > 3
@@ -15,7 +20,9 @@ const GroupHeader = (props) => {
   return (
     <View style={styles.mainContainer}>
       <TouchableOpacity
-        onPress={() => props.navigation.goBack()}
+        onPress={() => {
+          props.navigation.goBack();
+        }}
         style={{ padding: getWidthPixel(10) }}
       >
         <Image source={icons.Back} />
@@ -82,46 +89,46 @@ const GroupHeader = (props) => {
   );
 };
 
-export default GroupHeader
+export default GroupHeader;
 
 const styles = StyleSheet.create({
-    mainContainer: {
-        justifyContent: 'space-between',
-        flexDirection: 'row',
-        alignItems: 'center',
-        height: getHeightPixel(60),
-        paddingHorizontal: getWidthPixel(15),
-    },
-    groupName: {
-        fontFamily: 'Segoe UI',
-        fontSize: getHeightPixel(16),
-        fontWeight: '700',
-        color: '#222222',
-        maxWidth: '50%'
-    },
-    moreSection: {
-        flexDirection: 'row',
-        alignItems: 'center',
-    },
-    moreText: {
-        fontFamily: 'Segoe UI',
-        fontSize: getHeightPixel(12),
-        color: colors.accentGray,
-        textAlign: 'center'
-    },
-    singleImgView: {
-        height: 40,
-        width: 40,
-        borderRadius: 20,
-        borderWidth: 5,
-        borderColor: 'white',
-        justifyContent: 'center',
-        alignItems: 'center',
-        marginLeft: - 10,
-    },
-    singleImg: {
-        height: 35,
-        width: 35,
-        borderRadius: 20,
-    }
-})
+  mainContainer: {
+    justifyContent: "space-between",
+    flexDirection: "row",
+    alignItems: "center",
+    height: getHeightPixel(60),
+    paddingHorizontal: getWidthPixel(15),
+  },
+  groupName: {
+    fontFamily: "Segoe UI",
+    fontSize: getHeightPixel(16),
+    fontWeight: "700",
+    color: "#222222",
+    maxWidth: "50%",
+  },
+  moreSection: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  moreText: {
+    fontFamily: "Segoe UI",
+    fontSize: getHeightPixel(12),
+    color: colors.accentGray,
+    textAlign: "center",
+  },
+  singleImgView: {
+    height: 40,
+    width: 40,
+    borderRadius: 20,
+    borderWidth: 5,
+    borderColor: "white",
+    justifyContent: "center",
+    alignItems: "center",
+    marginLeft: -10,
+  },
+  singleImg: {
+    height: 35,
+    width: 35,
+    borderRadius: 20,
+  },
+});
