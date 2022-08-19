@@ -165,7 +165,9 @@ const ImageUpload = ({ open, handleModal, orgInfo, setReload }) => {
     console.log("img: ", img);
     if (img.fileInfo.fileType.substring(0, 2) == "vi") {
       console.log("this is video");
-      RNFS.readFile(img.path, "base64").then((RNFSresponse) => {
+
+      await RNFS.readFile(img.path, "base64").then((RNFSresponse) => {
+
         // console.log("RNFSresponse: ", RNFSresponse);
         const obj = {
           data: RNFSresponse,
@@ -181,7 +183,7 @@ const ImageUpload = ({ open, handleModal, orgInfo, setReload }) => {
       });
     } else {
       if (img.path) {
-        ImgToBase64.getBase64String(img.path)
+        await ImgToBase64.getBase64String(img.path)
           .then((base64String) => {
             //   console.log("base64String: ", base64String);
             const temp = base64String;
@@ -227,7 +229,7 @@ const ImageUpload = ({ open, handleModal, orgInfo, setReload }) => {
     }).then((image) => {
       //setUri(image.path);
       console.log("ma image wala hn", image);
-      image.map((item) => {
+      image.map(async (item) => {
         let imageName = item.filename;
         if (Platform.OS === "android") {
           imageName = new Date();
@@ -244,12 +246,14 @@ const ImageUpload = ({ open, handleModal, orgInfo, setReload }) => {
           },
         };
         console.log("item -> ", item);
-        convertImageToBase64(imgobj);
+
+        await convertImageToBase64(imgobj);
       });
     });
     // console.log("i am image converted in base 64", Uri);
     setTimeout(() => setFlag(!flag), 500);
   };
+  console.log('imageArray.length => ', imageArray.length)
 
   // Document
   const chooseDocument = async () => {
@@ -377,6 +381,40 @@ const ImageUpload = ({ open, handleModal, orgInfo, setReload }) => {
               </TouchableOpacity>
             )}
           </View>
+        <View
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "space-between",
+            paddingVertical: getHeightPixel(10),
+            paddingHorizontal: getWidthPixel(15),
+          }}
+        >
+          <Text style={styles.upload}>Upload</Text>
+          {imageArray.length > 0 && (
+            <TouchableOpacity onPress={fileBottomOpen}>
+              <View
+                style={{
+                  backgroundColor: colors.primary,
+                  justifyContent: "center",
+                  alignItems: "center",
+                  padding: 10,
+                  borderRadius: 10,
+                }}
+              >
+                <Image
+                  source={icons.iconsMini.Add}
+                  resizeMode="contain"
+                  style={{
+                    tintColor: "white",
+                  }}
+                />
+              </View>
+            </TouchableOpacity>
+          )}
+        </View>
+        <ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false}>
+
           <View>
             {imageArray.length > 0 ? (
               <TeamAttachmentList

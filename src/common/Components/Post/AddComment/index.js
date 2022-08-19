@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   Keyboard,
   KeyboardAvoidingView,
+  ScrollView,
 } from "react-native";
 import styles from "./styles";
 import addComment from "../../../../Reducers/addCommentApi";
@@ -17,6 +18,7 @@ import { useAddNewPostMutation } from "../../../../Reducers/postsApi";
 import { AttachmentList } from "../AttachmentsList";
 import Loading from "../../MainFrame";
 import addReplyOnComment from "../../../../pages/Landing/Api/addReplyToComment";
+import { AttachmentListComp } from "../../../../pages/BottomTabScreens/Messages/Components/AttachmentListComp";
 
 function AddComment(props) {
   const {
@@ -28,6 +30,7 @@ function AddComment(props) {
     showAttachmentPicker,
     attachmentShown,
     pickerData,
+    clearPickerData,
     commentType,
     //  setLoading,
   } = props;
@@ -38,6 +41,8 @@ function AddComment(props) {
   const [loading, setLoading] = useState(false);
 
   const keyboardVerticalOffset = Platform.OS === "ios" ? 0 : 0;
+
+  console.log('pickerData.length => ', pickerData.length)
 
   useEffect(() => {
     console.log("pickerData from useEffect: ", pickerData);
@@ -145,6 +150,29 @@ function AddComment(props) {
           <AttachIcon name="attachment" size={16} color={colors.accentGray} />
         </TouchableOpacity>
       </View>
+      {
+        Uri.length > 0 &&
+        <View style={{
+          height: 100,
+          borderTopColor: colors.grayLight,
+          borderTopWidth: 1,
+          borderBottomColor: colors.grayLight,
+          borderBottomWidth: 1,
+          paddingBottom: Platform.OS == 'ios' ? getHeightPixel(20) : 0
+        }}>
+          <ScrollView
+            horizontal={true}
+            showsHorizontalScrollIndicator={false}
+          >
+            <AttachmentListComp
+              Uri={Uri}
+              updateArray={(item) => clearPickerData((pre) => {
+                return pre.filter((temp) => temp != item);
+              })}
+            />
+          </ScrollView>
+        </View>
+      }
     </View>
   );
 }

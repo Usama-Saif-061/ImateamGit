@@ -213,7 +213,7 @@ const SignUpStep2 = ({ navigation }) => {
             <Pressable
               onPress={() => moveToNextScreen(navigation, "SignUpStep1")}
             >
-              <View style={SignUpStep2Styles.backButtonWrapper}>
+              <View style={{ ...SignUpStep2Styles.backButtonWrapper, marginLeft: getWidthPixel(-5) }}>
                 <Icon
                   name="keyboard-arrow-left"
                   size={21}
@@ -339,6 +339,7 @@ const SignUpStep2 = ({ navigation }) => {
                 //defaultIndex={2}
                 //default selected item index
                 placeholder="Search"
+                placeholderTextColor={colors.accentGray}
                 //place holder for the search input
                 resetValue={false}
                 //reset textInput Value with true and false state

@@ -609,7 +609,7 @@ const AddInterestsModal = (props) => {
           ))}
         </View>
 
-        <View style={AddInterestModalStyles.saveButton}>
+        <View style={{ ...AddInterestModalStyles.saveButton, paddingTop: getHeightPixel(10) }}>
           <ButtonCommon
             title={"CONTINUE"}
             method={async () => {

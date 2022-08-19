@@ -284,7 +284,9 @@ const TeamsLanding = ({ navigation, route }) => {
             style={{ margin: 15, flex: 1 }}
           />
         ) : newData ? (
-          <FlatList data={newData} renderItem={renderTeam} />
+          <FlatList
+            style={{ marginBottom: getHeightPixel(10) }}
+            data={newData} renderItem={renderTeam} />
         ) : (
           <View
             style={{ flex: 1, justifyContent: "center", alignItems: "center" }}

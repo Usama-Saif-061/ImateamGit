@@ -445,7 +445,7 @@ const NewOrg = ({ navigation, route }) => {
         </View>
 
         {/* CONTENT 7  CHECKBOX */}
-        <View style={styles.content}>
+        <View>
           <View style={{ flexDirection: "row" }}>
             <BouncyCheckbox
               size={18}
@@ -468,7 +468,7 @@ const NewOrg = ({ navigation, route }) => {
         {/* CONTENT 8 AVATAR */}
         <View
           style={
-            ([styles.content], { flexDirection: "row", alignItems: "center" })
+            ([styles.content], { flexDirection: "row", alignItems: "center", paddingBottom: getHeightPixel(30) })
           }
         >
           <TouchableOpacity onPress={chooseImage}>
@@ -563,10 +563,10 @@ const styles = StyleSheet.create({
     paddingVertical: getWidthPixel(8),
   },
   avatar: {
-    width: getHeightPixel(90),
-    height: getWidthPixel(90),
+    width: getHeightPixel(70),
+    height: getHeightPixel(70),
     resizeMode: "cover",
-    borderRadius: 60,
+    borderRadius: getHeightPixel(35),
     marginRight: getWidthPixel(14),
   },
   DeleteBtn: {

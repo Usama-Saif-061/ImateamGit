@@ -36,7 +36,7 @@ const MediaPicker = (props) => {
   const convertImageToBase64 = async (img) => {
     console.log("img: ", img);
     if (img.path) {
-      ImgToBase64.getBase64String(img.path)
+      await ImgToBase64.getBase64String(img.path)
         .then((base64String) => {
           //   console.log("base64String: ", base64String);
           const temp = base64String;
@@ -71,7 +71,7 @@ const MediaPicker = (props) => {
       //  console.log("pickerResult: ", pickerResult);
       pickerResult.map(async (item) => {
         //  console.log("item: ", item);
-        RNFS.readFile(item.uri, "base64").then((RNFSresponse) => {
+        await RNFS.readFile(item.uri, "base64").then((RNFSresponse) => {
           // console.log("RNFSresponse: ", RNFSresponse);
 
           const obj = {
@@ -112,7 +112,7 @@ const MediaPicker = (props) => {
     }).then((image) => {
       //setUri(image.path);
       console.log("ma image wala hn", image);
-      image.map((item) => {
+      image.map(async (item) => {
         let imageName = item.filename;
         if (Platform.OS === "android") {
           imageName = new Date();
@@ -129,7 +129,7 @@ const MediaPicker = (props) => {
           },
         };
 
-        convertImageToBase64(imgobj);
+        await convertImageToBase64(imgobj);
       });
     });
     // console.log("i am image converted in base 64", Uri);
