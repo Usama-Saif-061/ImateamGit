@@ -299,9 +299,10 @@ const Fans = ({ navigation }) => {
     console.log(searchFilter);
   }, [isSelected, statusList, searchFilter, isFetching, fansData, updatedFans]);
   const pressed = useSharedValue(false);
-  const startingPosition = 100;
-  const x = useSharedValue(startingPosition);
-  const y = useSharedValue(startingPosition);
+  const startingPositionX = getWidthPixel(300);
+  const startingPositionY = getHeightPixel(450);
+  const x = useSharedValue(startingPositionX);
+  const y = useSharedValue(startingPositionY);
   const eventHandler = useAnimatedGestureHandler({
     onStart: (event, ctx) => {
       pressed.value = true;
