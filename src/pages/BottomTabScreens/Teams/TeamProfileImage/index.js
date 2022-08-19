@@ -6,6 +6,7 @@ import {
   Text,
   Pressable,
   Image,
+  ScrollView,
 } from "react-native";
 import ModalHeader from "../../../../common/Components/ModalHeader";
 import ImagePicker from "react-native-image-crop-picker";
@@ -360,49 +361,51 @@ const ImageUpload = ({ open, handleModal, orgInfo, setReload }) => {
               </TouchableOpacity>
             }
           </View>
-          {
-            imageArray.length > 0 ?
-              <TeamAttachmentList
-                attachmentWidth={imageArray.length > 1 ? 75 : 100}
-                data={imageArray}
-                openingFrom={"mainLanding"}
-                removeItem={(el) => {
-                  setImageArray([...imageArray.filter((item) => item !== el)])
-                }}
-                onAttachmentPressed={(index) => {
-                  setImageIndex(index);
-                  setModalVisible(true);
-                }}
-              /> :
-              <TouchableOpacity
-                // onPress={() => pickImage()}
-                onPress={fileBottomOpen}
-                style={styles.imageContainer}
-              >
-                {selectedImage ? (
-                  <View>
-                    <Image
-                      source={{ uri: selectedImage.path }}
-                      style={styles.image}
-                    />
-                    <TouchableOpacity
-                      style={styles.imageDeleteBtn}
-                      onPress={() => selectImage()}
-                    >
-                      <Icon
-                        name="close"
-                        size={15}
-                        style={{ color: colors.white }}
+          <ScrollView>
+            {
+              imageArray.length > 0 ?
+                <TeamAttachmentList
+                  attachmentWidth={imageArray.length > 1 ? 75 : 100}
+                  data={imageArray}
+                  openingFrom={"mainLanding"}
+                  removeItem={(el) => {
+                    setImageArray([...imageArray.filter((item) => item !== el)])
+                  }}
+                  onAttachmentPressed={(index) => {
+                    setImageIndex(index);
+                    setModalVisible(true);
+                  }}
+                /> :
+                <TouchableOpacity
+                  // onPress={() => pickImage()}
+                  onPress={fileBottomOpen}
+                  style={styles.imageContainer}
+                >
+                  {selectedImage ? (
+                    <View>
+                      <Image
+                        source={{ uri: selectedImage.path }}
+                        style={styles.image}
                       />
-                    </TouchableOpacity>
-                  </View>
-                ) : (
-                  <View>
-                    <Text style={styles.text}>+ Attachments</Text>
-                  </View>
-                )}
-              </TouchableOpacity>
-          }
+                      <TouchableOpacity
+                        style={styles.imageDeleteBtn}
+                        onPress={() => selectImage()}
+                      >
+                        <Icon
+                          name="close"
+                          size={15}
+                          style={{ color: colors.white }}
+                        />
+                      </TouchableOpacity>
+                    </View>
+                  ) : (
+                    <View>
+                      <Text style={styles.text}>+ Attachments</Text>
+                    </View>
+                  )}
+                </TouchableOpacity>
+            }
+          </ScrollView>
         </View>
       </SafeAreaView>
       {/* SHOW MODAL */}
