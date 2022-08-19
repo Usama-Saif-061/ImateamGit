@@ -4,7 +4,6 @@ import {
   Modal,
   TouchableOpacity,
   Text,
-  Pressable,
   Image,
   ScrollView,
 } from "react-native";
@@ -91,7 +90,6 @@ const ImageUpload = ({ open, handleModal, orgInfo, setReload }) => {
     });
     setImageArray(arr);
   };
-  console.log("imageARR====>", imageArray.length);
   // const pickImage = () => {
   //   ImagePicker.openPicker({
   //     width: 300,
@@ -323,7 +321,7 @@ const ImageUpload = ({ open, handleModal, orgInfo, setReload }) => {
   };
   return (
     <Modal animationType="slide" visible={open}>
-      <SafeAreaView>
+      <SafeAreaView style={{ flex: 1 }}>
         {/* modal header */}
         <ModalHeader
           // heading={"Upload Image"}
@@ -346,7 +344,7 @@ const ImageUpload = ({ open, handleModal, orgInfo, setReload }) => {
           </Text>
         </View>
 
-        <View>
+        <ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false}>
           <View
             style={{
               flexDirection: "row",
@@ -379,7 +377,7 @@ const ImageUpload = ({ open, handleModal, orgInfo, setReload }) => {
               </TouchableOpacity>
             )}
           </View>
-          <ScrollView>
+          <View>
             {imageArray.length > 0 ? (
               <TeamAttachmentList
                 attachmentWidth={imageArray.length > 1 ? 75 : 100}
@@ -423,8 +421,8 @@ const ImageUpload = ({ open, handleModal, orgInfo, setReload }) => {
                 )}
               </TouchableOpacity>
             )}
-          </ScrollView>
-        </View>
+          </View>
+        </ScrollView>
       </SafeAreaView>
       {/* SHOW MODAL */}
       {modalVisible && (
