@@ -57,11 +57,9 @@ const SignUpStep2 = ({ navigation }) => {
   const [date, setDate] = useState(new Date());
   const [open, setOpen] = useState(false);
 
-  console.log(date);
-
   const [tags, setTags] = useState([]);
 
-  const [InterestsList, setInterestsList] = useState([]);
+  const InterestsList = useRef([]);
 
   const [selectedItems, selectItems] = useState([]);
 
@@ -69,6 +67,8 @@ const SignUpStep2 = ({ navigation }) => {
 
   const getAPIdata = async () => {
     const data = await InterestsAPI();
+    console.log("newData====>", data);
+
     //console.log("API", data);
     const newdata = data.map((item) => {
       return {
@@ -76,9 +76,7 @@ const SignUpStep2 = ({ navigation }) => {
         color: "#" + Math.floor(Math.random() * 16777215).toString(16),
       };
     });
-    //console.log(newdata);
-
-    setInterestsList(newdata);
+    InterestsList.current = newdata;
     _getButtonItems(newdata);
   };
   const _getButtonItems = (newdata) => {
@@ -104,7 +102,6 @@ const SignUpStep2 = ({ navigation }) => {
         items.push(g);
       }
     });
-    console.log(InterestsList.length);
     console.log("tags", items);
     setTags(items);
 
@@ -113,16 +110,16 @@ const SignUpStep2 = ({ navigation }) => {
     return items;
   };
   //and here is the code to filter the list in the multi-select.
-  const _filterGroup = (group) => {
-    setInterestsList(
-      InterestsList.filter(
-        (c) => c.interest_map_groups && c.interest_map_groups[0] !== group
-      )
-    );
-    //setIsOpen(true);
-    //console.log(InterestsList.length, InterestsList);
-  };
-  console.log(InterestsList.length);
+  // const _filterGroup = (group) => {
+  //   setInterestsList(
+  //     InterestsList.filter(
+  //       (c) => c.interest_map_groups && c.interest_map_groups[0] !== group
+  //     )
+  //   );
+  //   //setIsOpen(true);
+  //   //console.log(InterestsList.length, InterestsList);
+  // };
+  // console.log(InterestsList.length);
 
   function handleBackButtonClick() {
     navigation.goBack();
@@ -207,13 +204,18 @@ const SignUpStep2 = ({ navigation }) => {
         <KeyboardAvoidingView
           style={{ flex: 1 }}
           behavior={"position"}
-        // keyboardVerticalOffset={keyboardVerticalOffset}
+          // keyboardVerticalOffset={keyboardVerticalOffset}
         >
           <SafeAreaView>
             <Pressable
               onPress={() => moveToNextScreen(navigation, "SignUpStep1")}
             >
-              <View style={{ ...SignUpStep2Styles.backButtonWrapper, marginLeft: getWidthPixel(-5) }}>
+              <View
+                style={{
+                  ...SignUpStep2Styles.backButtonWrapper,
+                  marginLeft: getWidthPixel(-5),
+                }}
+              >
                 <Icon
                   name="keyboard-arrow-left"
                   size={21}
@@ -287,22 +289,21 @@ const SignUpStep2 = ({ navigation }) => {
               backgroundColor: colors.white,
               borderRadius: 6,
               zIndex: 1,
-              marginBottom: 10,
             }}
           >
             <View style={{ flex: 2 }}>
               <SearchableDropdown
                 ref={dropdownRef}
                 onTextChange={(text) => console.log(text)}
-                //On text change listner on the searchable input
                 onItemSelect={(item) => {
+                  let newArr = InterestsList.current.filter((i, index) => {
+                    return i.id !== item.id;
+                  });
+                  InterestsList.current = newArr;
+                  dropdownRef.current.makeFocussed();
                   selectItems((prevTags) => [...prevTags, item]);
-                  //addTags((prev) => [...prev, item.name]);
-                  //alert(JSON.stringify(item));
                 }}
-                //onItemSelect called after the selection from the dropdown
                 containerStyle={{ padding: 0 }}
-                //suggestion container style
                 textInputStyle={{
                   //inserted text style
                   padding: 12,
@@ -311,40 +312,29 @@ const SignUpStep2 = ({ navigation }) => {
                 }}
                 focus={true}
                 itemStyle={{
-                  //single dropdown item style
-                  //padding: 10,
-                  //marginTop: 2,
                   backgroundColor: colors.white,
                   borderColor: colors.accentGray,
                   padding: 10,
-                  //borderWidth: 1,
                 }}
                 itemTextStyle={{
-                  //text style of a sing  A23S473  le dropdown item
                   color: "#222",
                 }}
                 itemsContainerStyle={{
                   //items container style you can pass maxHeight
                   //to restrict the items dropdown hieght
-                  height: "40%",
+                  maxHeight: getHeightPixel(200),
                 }}
-                items={InterestsList.filter(
+                items={InterestsList.current.filter(
                   (c) =>
                     (c.interest_map_groups &&
                       selectedTags.includes(c.interest_map_groups[0])) ||
                     selectedTags.length === 0
                 )}
                 listProps={{ showsVerticalScrollIndicator: false }}
-                //mapping of item array
-                //defaultIndex={2}
-                //default selected item index
                 placeholder="Search"
                 placeholderTextColor={colors.accentGray}
-                //place holder for the search input
                 resetValue={false}
-                //reset textInput Value with true and false state
                 underlineColorAndroid="transparent"
-              //To remove the underline from the android input
               />
             </View>
             <TouchableOpacity
@@ -393,10 +383,12 @@ const SignUpStep2 = ({ navigation }) => {
                         </Text>
                         <TouchableWithoutFeedback
                           onPress={
-                            () =>
+                            () => {
                               selectItems(
                                 selectedItems.filter((i) => i !== item)
-                              )
+                              );
+                              InterestsList.current.unshift(item);
+                            }
 
                             //REMOVE ITEM FROM NAMELIST....
                           }

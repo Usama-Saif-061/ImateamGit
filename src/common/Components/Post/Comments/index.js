@@ -28,9 +28,6 @@ const Comments = ({
   const [selectedComment, setSelectedComment] = useState(0);
   const { data: userData, isFetching } = useGetUserQuery();
   const [commentReplies, getCommentReplies] = useState(null);
-  console.log("CommentData", data);
-
-  console.log("nesting level", nestingLevel);
 
   var replies;
 
@@ -46,7 +43,7 @@ const Comments = ({
     getCommentReplies(replies);
   };
 
-  useEffect(() => { }, [showCom]);
+  useEffect(() => {}, [showCom]);
   return (
     <View>
       <View>
@@ -214,8 +211,8 @@ const Comments = ({
                     )}
                   </View>
                   {showReplies &&
-                    item.reply_count > 0 &&
-                    item.id === commentId ? (
+                  item.reply_count > 0 &&
+                  item.id === commentId ? (
                     <View style={styles.repliesContainer}>
                       <Comments
                         data={commentReplies}
@@ -246,8 +243,8 @@ const Comments = ({
                 ? "Hide Replies"
                 : "Hide Comments"
               : nestingLevel === "2"
-                ? " Show all replies"
-                : "Show all comments"}
+              ? " Show all replies"
+              : "Show all comments"}
           </Text>
         </TouchableOpacity>
       </View>

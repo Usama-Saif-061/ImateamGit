@@ -1,23 +1,23 @@
 import React, { useEffect, useRef, useState } from "react";
-import { View, FlatList, TouchableOpacity, Dimensions, Text, TouchableWithoutFeedback, TouchableNativeFeedback, Platform } from "react-native";
+import {
+  View,
+  FlatList,
+  Dimensions,
+  Text,
+  TouchableWithoutFeedback,
+  Platform,
+} from "react-native";
 import FastImage from "react-native-fast-image";
 import Icon from "react-native-vector-icons/AntDesign";
 import colors from "../../colors";
-import {
-  getWidthPercentage,
-  getHeightPixel,
-  getHeightPercentage,
-  getWidthPixel,
-} from "../../helper";
-
-import WebView from "react-native-webview";
+import { getWidthPercentage, getHeightPercentage } from "../../helper";
 import Video from "react-native-video";
 import ImagePost from "./ImagePost";
 import VideoPost from "./VideoPost";
 import AttachmentPost from "./AttachmentPost";
-import Pdf from 'react-native-pdf';
-import ImageZoom from 'react-native-image-pan-zoom';
-import PhotoView from 'react-native-photo-view';
+import Pdf from "react-native-pdf";
+import ImageZoom from "react-native-image-pan-zoom";
+import PhotoView from "react-native-photo-view";
 
 const PostAttachmentList = (props) => {
   const {
@@ -26,22 +26,25 @@ const PostAttachmentList = (props) => {
     commentIndex,
     onAttachmentPressed,
     openingFrom,
-    scrollIndex
+    scrollIndex,
   } = props;
-  const flatListRef = useRef(null)
-  const [page, setPage] = useState(1)
-  var totalPages = useRef(0)
-  const [listPage, setCurrentListPage] = useState(0)
+  const flatListRef = useRef(null);
+  const [page, setPage] = useState(1);
+  var totalPages = useRef(0);
+  const [listPage, setCurrentListPage] = useState(0);
   useEffect(() => {
     if (openingFrom == "FullPost" && scrollIndex) {
-      console.log("value is ", scrollIndex)
+      console.log("value is ", scrollIndex);
       setTimeout(() => {
-        totalPages.current = 20
-        setPage(1)
-        flatListRef.current.scrollToIndex({ animated: false, index: scrollIndex });
+        totalPages.current = 20;
+        setPage(1);
+        flatListRef.current.scrollToIndex({
+          animated: false,
+          index: scrollIndex,
+        });
       }, 200);
     }
-  }, [])
+  }, []);
   const renderVideo = (item, index) => {
     return (
       <View
@@ -54,7 +57,7 @@ const PostAttachmentList = (props) => {
             name="play"
             size={50}
             color={colors.primary}
-            onPress={() => { }}
+            // onPress={() => {}}
             // onPress={() => setUri(Uri.slice(index + 1))}
             style={{
               position: "absolute",
@@ -75,7 +78,9 @@ const PostAttachmentList = (props) => {
           minLoadRetryCount={3}
           controls={openingFrom === "FullPost" ? true : false}
           // paused={openingFrom === "FullPost" ? false : true}
-          paused={index == scrollIndex ? false : index == listPage ? false : true}
+          paused={
+            index == scrollIndex ? false : index == listPage ? false : true
+          }
           fullscreen={true}
           resizeMode="contain"
           style={{
@@ -95,7 +100,7 @@ const PostAttachmentList = (props) => {
     return (
       <View
         style={{
-          width: Dimensions.get('window').width,
+          width: Dimensions.get("window").width,
           alignSelf: "center",
         }}
       >
@@ -167,26 +172,24 @@ const PostAttachmentList = (props) => {
             trustAllCerts={false}
             style={{
               flex: 1,
-              width: '100%',
-              height: '100%'
+              width: "100%",
+              height: "100%",
             }}
             onPageSingleTap={() => {
-              console.log(page)
-              console.log(totalPages)
+              console.log(page);
+              console.log(totalPages);
               if (page < totalPages.current) {
                 if (page == 0) {
-                  setPage(2)
+                  setPage(2);
+                } else {
+                  setPage(page + 1);
                 }
-                else {
-                  setPage(page + 1)
-                }
-              }
-              else {
-                setPage(1)
+              } else {
+                setPage(1);
               }
             }}
             onPageChanged={(page, numberOfPages) => {
-              totalPages.current = numberOfPages
+              totalPages.current = numberOfPages;
             }}
           />
         }
@@ -201,7 +204,9 @@ const PostAttachmentList = (props) => {
     const { fileType } = item.payload;
     //  console.log("fileType: ", fileType);
     const Container =
-      attachmentWidth === 100 ? TouchableWithoutFeedback : TouchableWithoutFeedback;
+      attachmentWidth === 100
+        ? TouchableWithoutFeedback
+        : TouchableWithoutFeedback;
     return (
       <Container
         onPress={() => {
@@ -221,8 +226,8 @@ const PostAttachmentList = (props) => {
         >
           {fileType !== "video/mp4" ? null : renderVideo(item, index)}
           {fileType === "image/jpeg" ||
-            fileType === "image/png" ||
-            fileType === "image/heic"
+          fileType === "image/png" ||
+          fileType === "image/heic"
             ? renderImage(item)
             : null}
           {fileType !== "application/pdf" ? null : renderDocument(item)}
@@ -231,25 +236,25 @@ const PostAttachmentList = (props) => {
     );
   };
   const calculateWidthHeight = (index) => {
-    const mainWidth = Dimensions.get("screen").width
+    const mainWidth = Dimensions.get("screen").width;
     var size = {
       width: mainWidth / 2 - 1,
-      height: mainWidth / 2
-    }
+      height: mainWidth / 2,
+    };
     if (index == 2 && data.length < 4) {
-      size.width = mainWidth
-      size.height = mainWidth / 2
+      size.width = mainWidth;
+      size.height = mainWidth / 2;
     }
     if (index < 2 && data.length == 2) {
-      size.width = mainWidth / 2 - 1
-      size.height = mainWidth / 2
+      size.width = mainWidth / 2 - 1;
+      size.height = mainWidth / 2;
     }
     if (index == 0 && data.length == 1) {
-      size.width = mainWidth
-      size.height = mainWidth
+      size.width = mainWidth;
+      size.height = mainWidth;
     }
-    return size
-  }
+    return size;
+  };
   const endView = () => {
     return (
       <View
@@ -260,99 +265,94 @@ const PostAttachmentList = (props) => {
           left: 0,
           bottom: 0,
           justifyContent: "center",
-          alignItems: "center"
+          alignItems: "center",
         }}
       >
         <Text
           style={{
             color: "white",
             fontSize: 18,
-            fontWeight: "500"
+            fontWeight: "500",
           }}
         >
-
-          {
-            `+${data.length - 4}`
-          }
-
+          {`+${data.length - 4}`}
         </Text>
       </View>
-    )
-  }
-  return (
-    openingFrom == "FullPost" ?
-      <FlatList
-        pagingEnabled={true}
-        ref={flatListRef}
-        data={data}
-        horizontal={true}
-        keyExtractor={keyExtractor}
-        renderItem={renderAttachments}
-        onMomentumScrollEnd={(e) => {
-          let pageNumber = Math.min(Math.max(Math.floor(e.nativeEvent.contentOffset.x / Dimensions.get("screen").width + 0.5) + 1, 0), data.length);
-          console.log(pageNumber);
-          setCurrentListPage(pageNumber - 1)
-        }}
-      /> :
-      <View
-        style={{
-          flex: 1,
-          flexDirection: "row",
-          flexWrap: "wrap",
-          justifyContent: "space-between"
-        }}
-      >
-        {
-          data.map((item, index) => {
-            if (index < 4) {
-              return (
-
-                <TouchableWithoutFeedback
-                  onPress={() => {
-                    onAttachmentPressed(index);
-                  }}
-                >
-                  <View
-                    key={`${index}`}
-                    style={{
-                      marginTop: 1
+    );
+  };
+  return openingFrom == "FullPost" ? (
+    <FlatList
+      pagingEnabled={true}
+      ref={flatListRef}
+      data={data}
+      horizontal={true}
+      keyExtractor={keyExtractor}
+      renderItem={renderAttachments}
+      onMomentumScrollEnd={(e) => {
+        let pageNumber = Math.min(
+          Math.max(
+            Math.floor(
+              e.nativeEvent.contentOffset.x / Dimensions.get("screen").width +
+                0.5
+            ) + 1,
+            0
+          ),
+          data.length
+        );
+        console.log(pageNumber);
+        setCurrentListPage(pageNumber - 1);
+      }}
+    />
+  ) : (
+    <View
+      style={{
+        flex: 1,
+        flexDirection: "row",
+        flexWrap: "wrap",
+        justifyContent: "space-between",
+      }}
+    >
+      {data.map((item, index) => {
+        if (index < 4) {
+          return (
+            <TouchableWithoutFeedback
+              onPress={() => {
+                onAttachmentPressed(index);
+              }}
+            >
+              <View
+                key={`${index}`}
+                style={{
+                  marginTop: 1,
+                }}
+              >
+                {item.payload.fileType.toLowerCase().includes("image") ? (
+                  <ImagePost item={item} size={calculateWidthHeight(index)} />
+                ) : item.payload.fileType.toLowerCase().includes("video") ? (
+                  <VideoPost
+                    item={item}
+                    size={calculateWidthHeight(index)}
+                    onPress={() => {
+                      onAttachmentPressed(index);
                     }}
-                  >
-                    {
-                      item.payload.fileType.toLowerCase().includes("image") ?
-                        <ImagePost
-                          item={item}
-                          size={calculateWidthHeight(index)}
-                        /> :
-                        item.payload.fileType.toLowerCase().includes("video") ?
-                          <VideoPost
-                            item={item}
-                            size={calculateWidthHeight(index)}
-                            onPress={() => {
-                              onAttachmentPressed(index);
-                            }}
-
-                          /> :
-                          item.payload.fileType.toLowerCase().includes("application") ?
-                            <AttachmentPost
-                              item={item}
-                              size={calculateWidthHeight(index)}
-                            /> : null
-                    }
-                    {
-                      (index == 3 && data.length > 4) &&
-                      endView()
-                    }
-                  </View>
-                </TouchableWithoutFeedback>
-              )
-            }
-            else {
-              return null
-            }
-          })
+                  />
+                ) : item.payload.fileType
+                    .toLowerCase()
+                    .includes("application") ? (
+                  <AttachmentPost
+                    item={item}
+                    size={calculateWidthHeight(index)}
+                  />
+                ) : null}
+                {index == 3 && data.length > 4 && endView()}
+              </View>
+            </TouchableWithoutFeedback>
+          );
+        } else {
+          return null;
         }
-      </View >
+      })}
+    </View>
   );
 };
 

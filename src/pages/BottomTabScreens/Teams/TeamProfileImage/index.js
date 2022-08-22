@@ -4,6 +4,7 @@ import {
   Modal,
   TouchableOpacity,
   Text,
+  Pressable,
   Image,
   ScrollView,
 } from "react-native";
@@ -121,6 +122,10 @@ const ImageUpload = ({ open, handleModal, orgInfo, setReload }) => {
   // };
   async function updateAvatar() {
     // setLoading(true);
+    if (imageArray.length > 8) {
+      alert("Attachments length should not exceed 8");
+      return;
+    }
     setGetImagesLoading(true);
     let jsonBody = {
       // memberId: orgInfo?.id,
@@ -165,9 +170,7 @@ const ImageUpload = ({ open, handleModal, orgInfo, setReload }) => {
     console.log("img: ", img);
     if (img.fileInfo.fileType.substring(0, 2) == "vi") {
       console.log("this is video");
-
       await RNFS.readFile(img.path, "base64").then((RNFSresponse) => {
-
         // console.log("RNFSresponse: ", RNFSresponse);
         const obj = {
           data: RNFSresponse,
@@ -246,14 +249,13 @@ const ImageUpload = ({ open, handleModal, orgInfo, setReload }) => {
           },
         };
         console.log("item -> ", item);
-
         await convertImageToBase64(imgobj);
       });
     });
     // console.log("i am image converted in base 64", Uri);
     setTimeout(() => setFlag(!flag), 500);
   };
-  console.log('imageArray.length => ', imageArray.length)
+  console.log("imageArray.length => ", imageArray.length);
 
   // Document
   const chooseDocument = async () => {
@@ -347,40 +349,6 @@ const ImageUpload = ({ open, handleModal, orgInfo, setReload }) => {
             {adminData?.user_info?.display_name}
           </Text>
         </View>
-
-        <ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false}>
-          <View
-            style={{
-              flexDirection: "row",
-              alignItems: "center",
-              justifyContent: "space-between",
-              paddingVertical: getHeightPixel(10),
-              paddingHorizontal: getWidthPixel(15),
-            }}
-          >
-            <Text style={styles.upload}>Upload</Text>
-            {imageArray.length > 0 && (
-              <TouchableOpacity onPress={fileBottomOpen}>
-                <View
-                  style={{
-                    backgroundColor: colors.primary,
-                    justifyContent: "center",
-                    alignItems: "center",
-                    padding: 10,
-                    borderRadius: 10,
-                  }}
-                >
-                  <Image
-                    source={icons.iconsMini.Add}
-                    resizeMode="contain"
-                    style={{
-                      tintColor: "white",
-                    }}
-                  />
-                </View>
-              </TouchableOpacity>
-            )}
-          </View>
         <View
           style={{
             flexDirection: "row",
@@ -414,7 +382,6 @@ const ImageUpload = ({ open, handleModal, orgInfo, setReload }) => {
           )}
         </View>
         <ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false}>
-
           <View>
             {imageArray.length > 0 ? (
               <TeamAttachmentList
